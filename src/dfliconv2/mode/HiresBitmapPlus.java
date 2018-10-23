@@ -21,30 +21,37 @@ import dfliconv2.value.Nibbles;
 import dfliconv2.variable.Bits;
 import dfliconv2.variable.Plus4Color;
 
-public class HiresBitmapXS implements Mode 
+public class HiresBitmapPlus implements Mode 
 {
-	private List<Value> luma = new ArrayList<>();
-	private List<Value> chroma = new ArrayList<>();
-	private List<Value> bitmap = new ArrayList<>();
-	private List<Value> xshift = new ArrayList<>();
-	private List<Optimizable> optiz = new ArrayList<>();
-	private int w,h;
+	protected List<Value> luma = new ArrayList<>();
+	protected List<Value> chroma = new ArrayList<>();
+	protected List<Value> bitmap = new ArrayList<>();
+	protected List<Value> xshift = new ArrayList<>();
+	protected List<Optimizable> optiz = new ArrayList<>();
+	protected int w,h;
 
-	public HiresBitmapXS()
+	public HiresBitmapPlus()
 	{
 		this(40,25);
 	}
-	public HiresBitmapXS(int w, int h) 
+	
+	public HiresBitmapPlus(int w, int h)
+	{
+		this(w,h,true);
+	}
+	
+	protected HiresBitmapPlus(int w, int h, boolean xs) 
 	{
 		this.w = w;
 		this.h = h;
 		Value[] color0 = new Value[w*h];
 		Value[] color1 = new Value[w*h];
-		for (int y = 0; y<h*8; y++)
-		{
-			Value xsh = Utils.randomize(new Bits.Three("xshift_"+Utils.format(y,h*8)));
-			xshift.add(xsh);
-		}
+		if (xs)
+			for (int y = 0; y<h*8; y++)
+			{
+				Value xsh = Utils.randomize(new Bits.Three("xshift_"+Utils.format(y,h*8)));
+				xshift.add(xsh);
+			}
 		for (int i = 0; i<w*h; i++)
 		{
 			color0[i] = Utils.randomize(new Plus4Color("color0_"+Utils.format(i,w*h)));
@@ -70,7 +77,11 @@ public class HiresBitmapXS implements Mode
 				Value b6 = Utils.randomize(new Bits.One("b_"+(x+6)+"_"+y));
 				Value b7 = Utils.randomize(new Bits.One("b_"+(x+7)+"_"+y));
 				bitmap.add(new HiresByte(b0,b1,b2,b3,b4,b5,b6,b7));
-				optiz.add(new HiresPixels(new Add(new Const(x),xshift.get(y)),new Const(y),color0[i],color1[i],b0,b1,b2,b3,b4,b5,b6,b7));
+				if (xs)
+					optiz.add(new HiresPixels(new Add(new Const(x),xshift.get(y)),new Const(y),color0[i],color1[i],b0,b1,b2,b3,b4,b5,b6,b7));
+				else
+					optiz.add(new HiresPixels(new Const(x),new Const(y),color0[i],color1[i],b0,b1,b2,b3,b4,b5,b6,b7));
+
 			}
 		}
 	}
@@ -99,7 +110,8 @@ public class HiresBitmapXS implements Mode
 			fs.put("_luma.bin", luma);
 			fs.put("_chroma.bin", chroma);
 			fs.put("_bitmap.bin", bitmap);
-			fs.put("_xshift.bin", xshift);
+			if (!xshift.isEmpty())
+				fs.put("_xshift.bin", xshift);
 		}
 		return fs;
 	}

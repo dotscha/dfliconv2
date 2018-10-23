@@ -154,10 +154,12 @@ public class CL
 	{
 		if ("hires".equals(mode))
 			return new HiresBitmap();
-		if ("hires_xs".equals(mode))
-			return new HiresBitmapXS();
+		if ("hires+".equals(mode))
+			return new HiresBitmapPlus();
 		if ("multi".equals(mode))
 			return new MultiBitmap();
+		if ("multi+".equals(mode))
+			return new MultiBitmapPlus();
 		if ("hfli".equals(mode))
 			return new HiresFli();
 		if ("mcfli".equals(mode))
@@ -202,7 +204,7 @@ public class CL
 		//Dithering d = new Point5(C);
 		
 		System.out.println("Coordinate pre-optimization");
-		o.optimizeCoords(img_opti, new FS());
+		o.optimizeCoords(img_opti, dopti);
 		boolean coord_opti = false;
 		
 		int p = 0;
@@ -215,6 +217,7 @@ public class CL
 			{
 				err0 = err1;
 				err1 = Math.min(err1, o.optimizeBF(img_opti,dopti, coord_opti));//BF
+				coord_opti = true;
 			}
 			else
 			{
@@ -226,8 +229,6 @@ public class CL
 				ceq=0;
 			else
 				ceq++;
-			if (p==2)
-				coord_opti = true;
 		} 
 		while (err0>err1 || ceq<2);
 		//o.resetUnusedColorVarables();
