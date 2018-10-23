@@ -40,7 +40,7 @@ public class Utils
 			o.draw(img);
 	}
 
-	public static void dither(Image img, int w, int h, Dithering d, boolean multi)
+	public static void dither(Image imgIn, Image imgOut, int w, int h, Dithering d, boolean multi)
 	{
 		Plus4Color p = new Plus4Color("p");
 		p.set(p.first());
@@ -54,16 +54,16 @@ public class Utils
 		{
 			for(int x = 0; x<w; x+=(multi?2:1))
 			{
-				Color p0  = img.get(x, y);
+				Color p0  = imgIn.get(x, y);
 				if (multi)
 				{
-					Color p1 = img.get(x+1, y);
+					Color p1 = imgIn.get(x+1, y);
 					p0 = new Color((p0.c0+p1.c0)/2,(p0.c1+p1.c1)/2,(p0.c2+p1.c2)/2);
 				}
 				int c = d.select(x/(multi?2:1), y, p0, pal);
-				img.set(x, y, pal[c]);
+				imgOut.set(x, y, pal[c]);
 				if (multi)
-					img.set(x+1, y, pal[c]);
+					imgOut.set(x+1, y, pal[c]);
 			}
 		}
 	}

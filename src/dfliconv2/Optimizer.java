@@ -4,6 +4,8 @@ import java.util.*;
 import java.util.Map.Entry;
 
 import dfliconv2.dithering.DiffusionBase;
+import dfliconv2.dithering.NoDithering;
+import dfliconv2.optimizable.ColorCount;
 
 public class Optimizer 
 {
@@ -71,14 +73,30 @@ public class Optimizer
 		}
 	}
 	
-	public void optimizeCoords(Image img)
+	//Pre-optimize coordinate variables
+	public void optimizeCoords(ImageImpl img, Dithering d)
 	{
-		
+		ImageImpl dimg = new ImageImpl(img.sourceWidth(), img.sourceHeight());
+		Utils.dither(img, dimg, img.sourceWidth(), img.sourceHeight(), d, false);
+		List<Optimizable> co = new ArrayList<>(optimizables.size());
+		for (Optimizable o : optimizables)
+		{
+			co.add(new ColorCount(o, 2));
+		}
+		Optimizer copti = new Optimizer(co);
+		d = new NoDithering();
+		double oldError, newError = Double.MAX_VALUE;
+		do
+		{
+			oldError = newError;
+			newError = copti.optimizeBF(dimg, d, true);
+		} 
+		while (newError<oldError);
 	}
 	
 	//Brute-Force like optimization, trying all values of all varables
 	//and keeping the better values.
-	public double optimizeBF(Image img, Dithering d)
+	public double optimizeBF(Image img, Dithering d, boolean coords)
 	{
 		double error = 0.0;
 		DiffusionBase dd = d instanceof DiffusionBase ? (DiffusionBase)d : null;
@@ -87,6 +105,8 @@ public class Optimizer
 			error += (bestErrors[oi] = optimizables.get(oi).error(img,d,null));
 		for (Variable var : vars)
 		{
+			if (!coords && coordVars.contains(var))
+				continue;
 			int originalValue = var.get();
 			int bestValue = originalValue;
 			Collection<Integer> optis = optiz.get(var);

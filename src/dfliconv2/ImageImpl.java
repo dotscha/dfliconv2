@@ -66,7 +66,7 @@ public class ImageImpl implements Image
 		Color c = pixels[i];
 		if (c==null)
 		{
-			c = pixels[i] = Global.imageColor(new RGB(img.getRGB(x%img.getWidth(),y%img.getHeight())));
+			c = pixels[i] = Global.imageColor(new RGB(img.getRGB(x,y)));
 		}
 		return c;
 	}

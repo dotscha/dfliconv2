@@ -201,6 +201,10 @@ public class CL
 		//Dithering d = new Bayer4x4(C);
 		//Dithering d = new Point5(C);
 		
+		System.out.println("Coordinate pre-optimization");
+		o.optimizeCoords(img_opti, new FS());
+		boolean coord_opti = false;
+		
 		int p = 0;
 		double err1 = Double.MAX_VALUE/2, err0 = err1*1.1;
 		int ceq = 0;
@@ -210,7 +214,7 @@ public class CL
 			if (p%2==0)
 			{
 				err0 = err1;
-				err1 = Math.min(err1, o.optimizeBF(img_opti,dopti));//BF
+				err1 = Math.min(err1, o.optimizeBF(img_opti,dopti, coord_opti));//BF
 			}
 			else
 			{
@@ -222,6 +226,8 @@ public class CL
 				ceq=0;
 			else
 				ceq++;
+			if (p==2)
+				coord_opti = true;
 		} 
 		while (err0>err1 || ceq<2);
 		//o.resetUnusedColorVarables();
