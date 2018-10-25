@@ -110,7 +110,10 @@ You can use the `-g` and `-s` options to do gamma correction and change the satu
 
 ### Plans
 
- * add more graphic modes, including character modes with optimized charset to approximate the picture with 256 chars.
  * add separate options for pre-dithering and post-dithering. The idea is that a pre-dithered image is used to optimize colors and post-dithering is used to create the actual output.
+ * option for loading custom palette, option to define what is "close" color.
+ * user defined graphic modes with some examples (eg. some c64 modes)
+ * add more graphic modes, including character modes with optimized charset to approximate the picture with 256 chars.
+ * add more native .prg vievers
  * add an optimization algorithm that recognizes "local" and "global" variables and runs quick local optimizations after every global variable change to figure out what is a better global value.
-
+ 
