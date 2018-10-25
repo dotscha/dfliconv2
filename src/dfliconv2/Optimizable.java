@@ -10,7 +10,6 @@ public abstract class Optimizable extends Value
 	public abstract int heigt();
 	
 	//Estimate potential error based on current input variables (eg. colors).
-	//double error(Image img, ColorCallback cb);
 	public abstract double error(Image img, Dithering d, ColorCallback cb);
 	
 	//Update dependent varables (eg. pixels) to realize the estimated error.

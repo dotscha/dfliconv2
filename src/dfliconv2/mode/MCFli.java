@@ -18,6 +18,7 @@ import dfliconv2.value.Add;
 import dfliconv2.value.Const;
 import dfliconv2.value.HighNibble;
 import dfliconv2.value.LowNibble;
+import dfliconv2.value.Mul;
 import dfliconv2.value.MultiByte;
 import dfliconv2.value.Nibbles;
 import dfliconv2.variable.Bits;
@@ -54,8 +55,8 @@ public class MCFli implements Mode
 			c3.set(0x71);
 			color0.add(c0);
 			color3.add(c3);
-			Value xsh = Utils.randomize(new Bits.Three("xshift_"+ys));
-			xshift.add(new Add(xsh,xsh));
+			Value xsh = Utils.randomize(new Bits.Two("xshift_"+ys));
+			xshift.add(new Mul(new Const(2),xsh));
 		}
 		for (int m = 0; m<4; m++)
 		{
