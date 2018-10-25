@@ -7,19 +7,9 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
-import dfliconv2.Mode;
-import dfliconv2.Optimizable;
 import dfliconv2.Utils;
 import dfliconv2.Value;
-import dfliconv2.VariableVisitor;
-import dfliconv2.optimizable.HiresPixels;
 import dfliconv2.value.Const;
-import dfliconv2.value.HighNibble;
-import dfliconv2.value.HiresByte;
-import dfliconv2.value.LowNibble;
-import dfliconv2.value.Nibbles;
-import dfliconv2.variable.Bits;
-import dfliconv2.variable.Plus4Color;
 
 public class HiresBitmap extends HiresBitmapPlus 
 {

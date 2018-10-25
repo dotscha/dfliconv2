@@ -19,7 +19,7 @@ public class CL
 {
 	public static void main(String[] argv) throws IOException
 	{
-		String mode = "?";
+		String mode = null;
 		String format = null;
 		String input = null;
 		String outputPrefix = "output";
@@ -29,7 +29,24 @@ public class CL
 		for (int i = 0; i<argv.length; i++)
 		{
 			String opt = argv[i];
-			if ("-m".equals(opt))
+			if ("-h".equals(opt))
+			{
+				System.out.println("dfliconv2 options:");
+				System.out.println("    -h                    : help message");
+				System.out.println("    -m <mode>             : graphic mode or ? for help");
+				System.out.println("    -f <format            : output format or ? for help");
+				System.out.println("    -d <dithering>        : dithering mode or ? for help");
+				System.out.println("    -i <input image>");
+				System.out.println("    -o <output prefix>");
+				System.out.println("    -p                    : save a preview image");
+				System.out.println("    -r <...>              : variable replacement");
+				System.out.println("    -g <gamma correction> : default is 1.0 for no correction");
+				System.out.println("    -s <saturation>       : default is 1.5");
+				System.out.println("    -seed <random seed>");
+				System.out.println("");
+				System.exit(0);
+			}
+			else if ("-m".equals(opt))
 				mode = argv[++i];
 			else if ("-f".equals(opt))
 				format = argv[++i];
@@ -53,24 +70,25 @@ public class CL
 				throw new RuntimeException("unknown option: "+opt);
 		}
 		Mode m = createMode(mode);
-		if (m==null)
-			System.exit(0);
-		System.out.println("Mode: "+mode);
-		
-		if ("?".equals(format))
+		if (m!=null)
 		{
-			List<String> f = new ArrayList<>();
-			f.add("none");
-			f.addAll(m.formats());
-			System.out.println("Formats: "+f);
-			System.exit(0);
-		} 
-		else if (format==null)
-			format = m.formats().get(0);
-		System.out.println("Format: "+format);
+			System.out.println("Mode: "+mode);
+			
+			if ("?".equals(format))
+			{
+				List<String> f = new ArrayList<>();
+				f.add("none");
+				f.addAll(m.formats());
+				System.out.println("Formats: "+f);
+				System.exit(0);
+			} 
+			else if (format==null)
+				format = m.formats().get(0);
+			System.out.println("Format: "+format);
+		}
 		
 		Dithering d = createDithering(dithering);
-		if (d==null)
+		if (d==null || m==null)
 			System.exit(0);
 		
 		Optimizer o = new Optimizer(m);
@@ -98,6 +116,7 @@ public class CL
 			{
 				ImageImpl p = new ImageImpl(img.xRange()[1]+1, img.yRange()[1]+1);
 				Utils.draw(m, p);
+				System.out.println("Saving "+outputPrefix+"_preview.png");
 				p.save(outputPrefix+"_preview.png", "png");
 			}
 		}
@@ -156,8 +175,8 @@ public class CL
 	private static Mode createMode(String mode)
 	{
 		if ("?".equals(mode))
-			System.out.println("Modes: "+ModeFactory.modes());
-		else
+			System.out.println("Supported graphic modes: "+ModeFactory.modes());
+		else if (mode!=null)
 			return ModeFactory.createMode(mode);
 		return null;
 	}
@@ -176,7 +195,7 @@ public class CL
 			d = new Ordered3x3(C);
 		else if ("fs".equals(dithering))
 			d = new FS();
-		else if (dithering==null || "no".equals(dithering))
+		else if (dithering==null || "no".equals(dithering) || "none".equals(dithering))
 			d = new NoDithering();
 		else if ("?".equals(dithering))
 		{
@@ -187,14 +206,7 @@ public class CL
 
 	static void optimize(ImageImpl img_opti, ImageImpl img_final, Optimizer o, Mode m, Dithering dfinal) 
 	{
-		double C = Global.closeColors();
-		//Mode m = new MultiBitmap();//62,40);
-		//Mode m = new MCDFli();//62,40);
-		//Mode m = new HiresFli();
 		Dithering dopti = new NoDithering();
-		//Dithering d = new Ordered3x3(C);
-		//Dithering d = new Bayer4x4(C);
-		//Dithering d = new Point5(C);
 		
 		System.out.print("Coordinate pre-optimization: ");
 		if(o.optimizeCoords(img_opti, dopti))
@@ -209,33 +221,30 @@ public class CL
 		int ceq = 0;
 		do
 		{
-			System.out.println("phase "+ ++p);
 			if (p%2==0)
 			{
+				System.out.println("phase (bf) "+ ++p);
 				err0 = err1;
 				err1 = Math.min(err1, o.optimizeBF(img_opti,dopti, coord_opti));//BF
 				coord_opti = true;
+				System.out.println("error: "+err1);
 			}
 			else
 			{
+				System.out.println("phase (km) "+ ++p);
 				err0 = err1;
 				err1 = Math.min(err1, o.optimizeKM(img_opti,dopti));
 			}
-			System.out.println(err1);
 			if (err0>err1)
 				ceq=0;
 			else
 				ceq++;
 		} 
 		while (err0>err1 || ceq<2);
-		//o.resetUnusedColorVarables();
-		//o.optimizeBF(img1,dopti);
-		//o.optimizeBF(img2,dopti);
-		//o.optimizeBF(img2,dopti);
-		//o.optimizeBF(img2,dopti);
 		o.optimizeKM(img_final,dopti);
 		o.resetUnusedColorVarables();
 		Utils.update(m, img_final, dfinal);
+		System.out.println("Optimization done!");
 	}
 	
 	static Map<Variable,Value> replacements(Optimizer o, String replace)

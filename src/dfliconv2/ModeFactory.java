@@ -15,10 +15,10 @@ public class ModeFactory
 	{
 		register("hires", HiresBitmap.class);
 		register("hires+", HiresBitmapPlus.class);
+		register("hires-dfli", HiresFli.class);
 		register("multi", MultiBitmap.class);
 		register("multi+", MultiBitmapPlus.class);
 		register("multi-dfli", MCFli.class);
-		register("hires-dfli", HiresFli.class);
 	}
 	
 	private static void register(String name, Class<? extends Mode> clazz)
@@ -67,11 +67,9 @@ public class ModeFactory
 		{
 			try 
 			{
-				if (parse.length==1)
-					return (Mode)mc.getConstructors()[0].newInstance();
-				else
+				List<Integer> ps = new ArrayList<>();
+				if (parse.length==2)
 				{
-					List<Integer> ps = new ArrayList<>();
 					for(String pstr : parse[1].split(","))
 					{
 						if (pstr.startsWith("'") && pstr.endsWith("'"))
@@ -82,12 +80,12 @@ public class ModeFactory
 						else
 							ps.add(Integer.parseInt(pstr));
 					}
-					for (Constructor<?> ct : mc.getConstructors())
+				}
+				for (Constructor<?> ct : mc.getConstructors())
+				{
+					if (ct.getParameterCount()==ps.size())
 					{
-						if (ct.getParameterCount()==ps.size())
-						{
-							return (Mode) ct.newInstance(ps.toArray());
-						}
+						return (Mode) ct.newInstance(ps.toArray());
 					}
 				}
 			} 

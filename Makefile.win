@@ -11,6 +11,7 @@ LIB = classes.jar
 all: $(LIB)
 
 test: $(LIB)
+	$(JAVA) -cp $(LIB) dfliconv2.CL -h
 	$(JAVA) -cp $(LIB) dfliconv2.CL
 	$(JAVA) -cp $(LIB) dfliconv2.CL -m "multi(40,20)"	
 

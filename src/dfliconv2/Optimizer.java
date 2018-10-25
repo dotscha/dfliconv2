@@ -278,7 +278,6 @@ public class Optimizer
 		//Update them with random values
 		for (Variable v : unusedColorVariables)
 			v.updateRandom(R);
-		System.out.println("Unused :"+unusedColorVariables.size());
 		return bestErrors;
 	}
 }

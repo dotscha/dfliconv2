@@ -15,6 +15,7 @@ public class Utils
 	public static void saveFile(String name, List<Value> data) throws IOException
 	{
 		FileOutputStream out = new FileOutputStream(name);
+		System.out.println("Saving "+name);
 		for (Value v : data)
 			out.write(v.get());
 		out.close();

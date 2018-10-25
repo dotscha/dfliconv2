@@ -11,16 +11,13 @@ import dfliconv2.Mode;
 import dfliconv2.Optimizable;
 import dfliconv2.Utils;
 import dfliconv2.Value;
-import dfliconv2.Variable;
 import dfliconv2.VariableVisitor;
 import dfliconv2.optimizable.HiresPixels;
-import dfliconv2.optimizable.MultiPixels;
 import dfliconv2.value.Add;
 import dfliconv2.value.Const;
 import dfliconv2.value.HighNibble;
 import dfliconv2.value.HiresByte;
 import dfliconv2.value.LowNibble;
-import dfliconv2.value.MultiByte;
 import dfliconv2.value.Nibbles;
 import dfliconv2.variable.Bits;
 import dfliconv2.variable.Plus4Color;
@@ -49,7 +46,7 @@ public class HiresFli implements Mode
 		for (int y = 0; y<h*8; y++)
 		{
 			Value xsh = Utils.randomize(new Bits.Three("xshift_"+Utils.format(y,h*8)));
-			xshift.add(new Add(xsh,xsh));
+			xshift.add(xsh);
 		}
 		for (int m = 0; m<4; m++)
 		{
