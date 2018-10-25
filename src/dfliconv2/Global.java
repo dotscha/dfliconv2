@@ -8,7 +8,7 @@ public class Global
 {
 	public static Random R = new Random();
 	
-	public static double saturation = 1.5;
+	public static double saturation = 1.0;
 	public static double gammaCorrection = 1.0;
 	
 	
