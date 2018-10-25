@@ -66,7 +66,7 @@ Not all supported modes have a executable `prg` format yet, maybe never will, le
 
 ### Supported dithering methods
 
-`> dfliconv2 -m ?`
+`> dfliconv2 -d ?`
 
  * `fs` stands for Floyd–Steinberg dithering.
  * `point5` only uses plain colors or chessboard dithering. 
