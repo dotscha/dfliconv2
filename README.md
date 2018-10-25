@@ -52,8 +52,8 @@ Get the list of supported modes by running
 `> dfliconv2 -m ?`
 
 The list will include parametrized modes too, like `hires(w,h)` where `w` and `h` stands for width and height in characters.
-So, for example `-m hires(80,25)` means hires bitmap of dimensions 640x200, ie. a double screen hires mode.
-New graphic modes will be added incrementally. The plan is to implement all popular modes including character modes with optimized charset.
+So, for example `-m "hires(80,25)"` means hires bitmap of dimensions 640x200, ie. a double screen hires mode.
+New graphic modes will be added incrementally.
 
 ### Supported output formats
 
@@ -116,4 +116,3 @@ You can use the `-g` and `-s` options to do gamma correction and change the satu
  * add more graphic modes, including character modes with optimized charset to approximate the picture with 256 chars.
  * add more native .prg vievers
  * add an optimization algorithm that recognizes "local" and "global" variables and runs quick local optimizations after every global variable change to figure out what is a better global value.
- 
