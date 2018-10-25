@@ -159,7 +159,7 @@ public class MultiBitmapPlus implements Mode
 			prg.add(color3.get(0));
 			fs.put(".prg", prg);
 		}
-		else
+		else if (format.equals("boti"))
 		{
 			List<Value> file = new ArrayList<>();
 			file.add(new Const(0x00));

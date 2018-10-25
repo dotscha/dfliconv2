@@ -9,6 +9,6 @@ public class MultiBitmap extends MultiBitmapPlus
 
 	public MultiBitmap(int w, int h) 
 	{
-		super(40,25,false);
+		super(w,h,false);
 	}
 }

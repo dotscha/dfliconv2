@@ -74,8 +74,10 @@ public class Optimizer
 	}
 	
 	//Pre-optimize coordinate variables
-	public void optimizeCoords(ImageImpl img, Dithering d)
+	public boolean optimizeCoords(ImageImpl img, Dithering d)
 	{
+		if (coordVars.isEmpty())
+			return false;
 		ImageImpl dimg = new ImageImpl(img.sourceWidth(), img.sourceHeight());
 		Utils.dither(img, dimg, img.sourceWidth(), img.sourceHeight(), d, false);
 		List<Optimizable> co = new ArrayList<>(optimizables.size());
@@ -92,6 +94,7 @@ public class Optimizer
 			newError = copti.optimizeBF(dimg, d, true);
 		} 
 		while (newError<oldError);
+		return true;
 	}
 	
 	//Brute-Force like optimization, trying all values of all varables

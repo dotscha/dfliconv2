@@ -1,9 +1,5 @@
 package dfliconv2.variable;
 
-import java.util.Random;
-
-import dfliconv2.Variable;
-
 public class Range extends RangeBase
 {
 	private int begin, size;

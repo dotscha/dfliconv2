@@ -59,7 +59,10 @@ public class CL
 		
 		if ("?".equals(format))
 		{
-			System.out.println("Formats: "+m.formats());
+			List<String> f = new ArrayList<>();
+			f.add("none");
+			f.addAll(m.formats());
+			System.out.println("Formats: "+f);
 			System.exit(0);
 		} 
 		else if (format==null)
@@ -152,20 +155,10 @@ public class CL
 	
 	private static Mode createMode(String mode)
 	{
-		if ("hires".equals(mode))
-			return new HiresBitmap();
-		if ("hires+".equals(mode))
-			return new HiresBitmapPlus();
-		if ("multi".equals(mode))
-			return new MultiBitmap();
-		if ("multi+".equals(mode))
-			return new MultiBitmapPlus();
-		if ("hfli".equals(mode))
-			return new HiresFli();
-		if ("mcfli".equals(mode))
-			return new MCFli();
 		if ("?".equals(mode))
-			System.out.println("Modes: [hires, hires_xs, multi, hfli, mcfli]");
+			System.out.println("Modes: "+ModeFactory.modes());
+		else
+			return ModeFactory.createMode(mode);
 		return null;
 	}
 	
@@ -203,8 +196,12 @@ public class CL
 		//Dithering d = new Bayer4x4(C);
 		//Dithering d = new Point5(C);
 		
-		System.out.println("Coordinate pre-optimization");
-		o.optimizeCoords(img_opti, dopti);
+		System.out.print("Coordinate pre-optimization: ");
+		if(o.optimizeCoords(img_opti, dopti))
+			System.out.println("done");
+		else
+			System.out.println("no coordinate variables");
+		
 		boolean coord_opti = false;
 		
 		int p = 0;

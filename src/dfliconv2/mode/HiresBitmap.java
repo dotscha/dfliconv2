@@ -58,7 +58,7 @@ public class HiresBitmap extends HiresBitmapPlus
 			prg.addAll(bitmap);
 			fs.put(".prg", prg);
 		}
-		else
+		else if (format.equals("boti"))
 		{
 			List<Value> file = new ArrayList<>();
 			file.add(new Const(0x00));
