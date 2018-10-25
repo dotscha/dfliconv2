@@ -1,4 +1,4 @@
-dfliconv2
+DFLIConv2
 =========
 This is my second attempt to write a generic image converter targeting the Commodore Plus/4.
 
@@ -105,7 +105,8 @@ I think you get the idea.
 ### Other notes
 
 The input image is never resized (as mentioned above). The image is treated as a periodic pattern in both directions.
-You can use the `-g` and `-s` options to do gamma correction and change the saturation of the image.
+
+You can use the `-g` and `-s` options to do gamma correction and change the saturation of the image. Gamma is applied in the RGB color space, saturatuin is applied in the YUV color space. All other computations are done in the Lab color space.
 
 ### Plans
 
