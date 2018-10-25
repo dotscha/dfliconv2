@@ -37,7 +37,7 @@ The initial state for the optimization process is randomly generated, so almost 
 
 ### Simple conversion examples
 
-To hires, saving `ouput.prg` and `output_preview.png` (`output` is the default output file prefix):
+To hires, saving `ouput.prg` and `output_preview.png` ("output" is the default output file prefix):
 
 `> dfliconv2 -m hires -i image.jpg -p`
 
