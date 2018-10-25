@@ -98,7 +98,9 @@ Let's say you want a hires mode where chars are leaning right 45 degrees. That i
 
 On the left side of `=` you can have a variable or a range of variables like above and on the right side you can specify a 
 single or coma separated list of variables and integer constants. If the variable list on the left side is longer than the list 
-on the right side the later is repeated periodically during assignment.
+on the right side the later is repeated periodically during assignment. 
+
+You don't have to use a "full" range, you can use "xshint_008...xshift_015" too. Every variable that is lexicographically between the begining and the end of the range will be included in the range in lexicographical order.
 
 I think you get the idea.
 
