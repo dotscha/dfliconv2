@@ -19,12 +19,12 @@ public class YUV extends Color
 	
 	public YUV(RGB c)
 	{
-		double y = WR*c.c0+YUV.WG*c.c1+YUV.WB*c.c2;
-		double u = Umax/(1-YUV.WB)*(c.c2-y);
-		double v = Vmax/(1-YUV.WR)*(c.c0-y);
-        this.c0 = (float) y;
-        this.c1 = (float) u;
-        this.c2 = (float) v;
+		double y = WR*c.c0+WG*c.c1+WB*c.c2;
+		double u = Umax/(1-WB)*(c.c2-y);
+		double v = Vmax/(1-WR)*(c.c0-y);
+		this.c0 = (float) y;
+		this.c1 = (float) u;
+		this.c2 = (float) v;
 	}
 	
 	public YUV saturation(double s)
@@ -34,8 +34,8 @@ public class YUV extends Color
 	
 	public static YUV saturation(YUV c, double s)
 	{
-		c.c1*= s;
-		c.c2*= s;
+		c.c1*= s;	//U
+		c.c2*= s;	//V
 		return c;
 	}
 	
