@@ -41,7 +41,7 @@ public class CL
 				System.out.println("    -p                    : save a preview image");
 				System.out.println("    -r <...>              : variable replacement");
 				System.out.println("    -g <gamma correction> : default is 1.0 for no correction");
-				System.out.println("    -s <saturation>       : default is 1.5");
+				System.out.println("    -s <saturation>       : default is 1.0 for no correction");
 				System.out.println("    -seed <random seed>");
 				System.out.println("");
 				System.exit(0);
