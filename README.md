@@ -37,7 +37,7 @@ The initial state for the optimization process is randomly generated, so almost 
 
 ### Simple conversion examples
 
-To hires, saving `ouput.prg` and `output_preview.png` ("output" is the default output file prefix):
+To hires, saving `output.prg` and `output_preview.png` ("output" is the default output file prefix):
 
 `> dfliconv2 -m hires -i image.jpg -p`
 
@@ -80,7 +80,7 @@ You can print a summary of the variables that are optimized when converting to t
 
 `> dfliconv2 -m multi+`
 
-You can see that in this mode you have separate color0, color3 and xshift variables for every rasterline.
+You can see that in this mode you have separate color0, color3 and xshift variables for every raster-line.
 
 ### Variable restrictions
 
