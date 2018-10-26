@@ -10,7 +10,7 @@ width and height of the target (multi-screen graphic) and I also want to specify
 background color or the same (but optimized) xshift value for the whole screen instead of independently optimized values for
 each raster line. The complete separation of the optimization problem and the optimization algorithm would even allow the user
 to define new graphic modes without coding. He/she would only need to write some configuration files that define the optimization 
-variables (topically colors and pixels) and how those variables define the picture and the output file. Actually, every image 
+variables (typically colors and pixels) and how those variables define the picture and the output file. Actually, every image 
 converter has these definitions, I just want to make them explicit and enable the user to define them.
 
 ## Design non-goals
