@@ -16,11 +16,11 @@ converter has these definitions, I just want to make them explicit and enable th
 ## Design non-goals
 
 I don't want it to be super fast, only reasonably fast, I don't care if it takes a minute to convert an image.
-I don't want to deal with resizing the image to the dimensions of the given graphic mode. Is is your job to prepare your input.
+I don't want to deal with resizing the image to the dimensions of the given graphic mode. It is your job to prepare your input.
 
 ## How does the conversion work?
 
-Thee optimization algorithms are implemented at the moment:
+Three optimization algorithms are implemented at the moment:
 
  * Coordinate pre-optimization is used to fine tune coordinate shifts (like xshift) to reduce the average number of distinct colors per cell (like character) that exceed the capacity of the given graphic mode.
  * One dimensional brute-force algorithm that tries every possible value of every variable, evaluates the conversion error and keeps the values resulting less error.
@@ -51,7 +51,7 @@ Get the list of supported modes by running
 
 `> dfliconv2 -m ?`
 
-The list will include parametrized modes too, like `hires(w,h)` where `w` and `h` stands for width and height in characters.
+The list will include parameterized modes too, like `hires(w,h)` where `w` and `h` stands for width and height in characters.
 So, for example `-m "hires(80,25)"` means hires bitmap of dimensions 640x200, ie. a double screen hires mode.
 New graphic modes will be added incrementally.
 
@@ -97,10 +97,10 @@ Let's say you want a hires mode where chars are leaning right 45 degrees. That i
 `> dfliconv2 -m hires+ -r "xshift_000...xshift_199=7,6,5,4,3,2,1,0"`
 
 On the left side of `=` you can have a variable or a range of variables like above and on the right side you can specify a 
-single or coma separated list of variables and integer constants. If the variable list on the left side is longer than the list 
+single or comma separated list of variables and integer constants. If the variable list on the left side is longer than the list 
 on the right side the later is repeated periodically during assignment. 
 
-You don't have to use a "full" range, you can use "xshint_008...xshift_015" too. Every variable that is lexicographically between the begining and the end of the range will be included in the range in lexicographical order.
+You don't have to use a "full" range, you can use "xshint_008...xshift_015" too. Every variable that is lexicographically between the beginning and the end of the range will be included in the range in lexicographical order.
 
 I think you get the idea.
 
@@ -108,7 +108,7 @@ I think you get the idea.
 
 The input image is never resized (as mentioned above). The image is treated as a periodic pattern in both directions.
 
-You can use the `-g` and `-s` options to do gamma correction and change the saturation of the image. Gamma is applied in the RGB color space, saturatuin is applied in the YUV color space. All other computations are done in the Lab color space.
+You can use the `-g` and `-s` options to do gamma correction and change the saturation of the image. Gamma is applied in the RGB color space, saturation is applied in the YUV color space. All other computations are done in the Lab color space.
 
 ### Plans
 
@@ -116,5 +116,5 @@ You can use the `-g` and `-s` options to do gamma correction and change the satu
  * option for loading custom palette, option to define what is "close" color.
  * user defined graphic modes with some examples (eg. some c64 modes)
  * add more graphic modes, including character modes with optimized charset to approximate the picture with 256 chars.
- * add more native .prg vievers
+ * add more native .prg viewers
  * add an optimization algorithm that recognizes "local" and "global" variables and runs quick local optimizations after every global variable change to figure out what is a better global value.
