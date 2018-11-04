@@ -10,7 +10,10 @@ public class Global
 	
 	public static double saturation = 1.0;
 	public static double gammaCorrection = 1.0;
-	
+
+	public static double eps = 0.01;
+
+	public static int VERBOSITY = 1;
 	
 	public static Color imageColor(RGB c)
 	{
@@ -27,4 +30,5 @@ public class Global
 	{
 		return Math.sqrt(Palette.getColor(0).d2(Palette.getColor(0x11)));
 	}
+
 }

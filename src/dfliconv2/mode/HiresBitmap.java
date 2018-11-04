@@ -40,7 +40,7 @@ public class HiresBitmap extends HiresBitmapPlus
 		}
 		else if (format.equals("prg"))
 		{
-			List<Value> prg = Utils.loadPrg("hires.prg");
+			List<Value> prg = Utils.loadViewer("hires.prg");
 			prg.addAll(luma);
 			prg.addAll(Collections.nCopies(24, new Const(0)));
 			prg.addAll(chroma);		
@@ -54,11 +54,9 @@ public class HiresBitmap extends HiresBitmapPlus
 			file.add(new Const(0x00));
 			file.add(new Const(0x78));
 			file.addAll(luma);
-			for (int i = 0; i<24; i++)
-				file.add(new Const(0));
+			file.addAll(Collections.nCopies(24, new Const(0)));
 			file.addAll(chroma);
-			for (int i = 0; i<24; i++)
-				file.add(new Const(0));
+			file.addAll(Collections.nCopies(24, new Const(0)));
 			file.addAll(bitmap);
 			fs.put(".prg",file);
 		}

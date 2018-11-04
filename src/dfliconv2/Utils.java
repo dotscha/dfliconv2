@@ -1,5 +1,6 @@
 package dfliconv2;
 
+import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -7,6 +8,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map.Entry;
 
+import dfliconv2.optimizable.BitError;
 import dfliconv2.value.Const;
 import dfliconv2.variable.Plus4Color;
 
@@ -69,10 +71,10 @@ public class Utils
 		}
 	}
 	
-	public static List<Value> loadPrg(String name)
+	public static List<Value> loadViewer(String name)
 	{
 		List<Value> file = new ArrayList<>();
-		InputStream s = Utils.class.getResourceAsStream("/prg/"+name);
+		InputStream s = Utils.class.getResourceAsStream("/viewer/"+name);
 		int b;
 		do
 		{
@@ -95,29 +97,42 @@ public class Utils
 			saveFile(prefix+e.getKey(), e.getValue());
 	}
 	
+	public static void loadOutput(Mode m, String format, String prefix) throws IOException
+	{
+		List<Optimizable> optiz = new ArrayList<>();
+		for (Entry<String, List<Value>> e : m.files(format).entrySet())
+		{
+			String fn = prefix+e.getKey();
+			System.out.println("Importing "+fn);
+			FileInputStream f = null;
+			try
+			{
+				f = new FileInputStream(fn);
+				for (Value v : e.getValue())
+				{
+					int b = f.read();
+					if (b>=0)
+						optiz.add(new BitError(v,b));
+					else
+						throw new RuntimeException("File too short: "+fn);
+				}
+				if (f.read()>=0)
+					throw new RuntimeException("File too long: "+fn);
+			}
+			finally
+			{
+				f.close();
+			}
+		}
+		Optimizer o = new Optimizer(optiz);
+		double err = o.optimizeBF(null,null,false);
+		if (err>0)
+			System.out.println("WARNING: Imported with errors!");
+	}
+	
 	public static String format(int v, int max)
 	{
 		String m = ""+(max-1);
 		return String.format("%0"+m.length()+"d",v);
-	}
-	
-	public static List<Value> visitValue(List<Value> vs, VariableVisitor v)
-	{
-		List<Value> out = new ArrayList<>(vs.size());
-		for (Value value : vs)
-		{
-			out.add(value.visit(v));
-		}
-		return out;
-	}
-
-	public static List<Optimizable> visitOptiz(List<Optimizable> optiz, VariableVisitor v) 
-	{
-		List<Optimizable> out = new ArrayList<>(optiz.size());
-		for (Optimizable value : optiz)
-		{
-			out.add((Optimizable)value.visit(v));
-		}
-		return out;
 	}
 }

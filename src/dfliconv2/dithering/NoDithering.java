@@ -1,5 +1,6 @@
 package dfliconv2.dithering;
 
+import dfliconv2.Global;
 import dfliconv2.Palette;
 
 public class NoDithering extends Base 
@@ -12,7 +13,7 @@ public class NoDithering extends Base
 		for (int i = 0; i<colors.length; i++)
 		{
 			double error = Palette.getColor(colors[i]).d2(c0,c1,c2);
-			if (error<bestError)
+			if (error<bestError-Global.eps)
 			{
 				bestError = error;
 				bestColorIndex = i;

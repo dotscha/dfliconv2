@@ -1,79 +1,88 @@
 package dfliconv2;
 
+import java.util.*;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Comparator;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Random;
-import java.util.TreeMap;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
-
 import dfliconv2.dithering.*;
-import dfliconv2.mode.*;
 
 public class CL
 {
+	private static boolean coordPreOpt = true;
+	
 	public static void main(String[] argv) throws IOException
 	{
 		String mode = null;
 		String format = null;
 		String input = null;
-		String outputPrefix = "output";
-		String dithering = null;
+		String baseline = null;
+		String baselineFormat = null;
+		String outputPrefix = null;
+		String dithering = "no";
 		List<String> replace = new ArrayList<>();
 		boolean preview = false;
-		for (int i = 0; i<argv.length; i++)
+		if (argv.length==0)
 		{
-			String opt = argv[i];
-			if ("-h".equals(opt))
-			{
-				System.out.println("dfliconv2 options:");
-				System.out.println("    -h                    : help message");
-				System.out.println("    -m <mode>             : graphic mode or ? for help");
-				System.out.println("    -f <format            : output format or ? for help");
-				System.out.println("    -d <dithering>        : dithering mode or ? for help");
-				System.out.println("    -i <input image>");
-				System.out.println("    -o <output prefix>");
-				System.out.println("    -p                    : save a preview image");
-				System.out.println("    -r <...>              : variable replacement");
-				System.out.println("    -g <gamma correction> : default is 1.0 for no correction");
-				System.out.println("    -s <saturation>       : default is 1.0 for no correction");
-				System.out.println("    -seed <random seed>");
-				System.out.println("");
-				System.exit(0);
-			}
-			else if ("-m".equals(opt))
-				mode = argv[++i];
-			else if ("-f".equals(opt))
-				format = argv[++i];
-			else if ("-d".equals(opt))
-				dithering = argv[++i];
-			else if ("-i".equals(opt))
-				input = argv[++i];
-			else if ("-o".equals(opt))
-				outputPrefix = argv[++i];
-			else if ("-p".equals(opt))
-				preview = true;
-			else if ("-g".equals(opt))
-				Global.gammaCorrection = Double.parseDouble(argv[++i]);
-			else if ("-s".equals(opt))
-				Global.saturation = Double.parseDouble(argv[++i]);
-			else if ("-r".equals(opt))
-				replace.add(argv[++i]);
-			else if ("-seed".equals(opt))
-				Global.R = new Random(Long.parseLong(argv[++i]));
-			else
-				throw new RuntimeException("unknown option: "+opt);
+			printHelp();
+			System.exit(0);
 		}
+		else if (argv.length==1 && !argv[0].startsWith("-"))
+		{
+			input = argv[0];
+			mode = "multi-dfli";
+			preview = true;
+			System.out.println(input+" is converted to "+mode+", use -h to list options!");
+		}
+		else
+		{
+			for (int i = 0; i<argv.length; i++)
+			{
+				String opt = argv[i];
+				if ("-h".equals(opt) || "-help".equals(opt))
+				{
+					printHelp();
+					System.exit(0);
+				}
+				else if ("-m".equals(opt) || "-mode".equals(opt))
+					mode = argv[++i];
+				else if ("-f".equals(opt) || "-format".equals(opt))
+					format = argv[++i];
+				else if ("-d".equals(opt) || "-dithering".equals(opt))
+					dithering = argv[++i];
+				else if ("-i".equals(opt) || "-input".equals(opt))
+					input = argv[++i];
+				else if ("-b".equals(opt) || "-baseline".equals(opt))
+				{
+					baseline = argv[++i];
+					coordPreOpt = false;
+				}
+				else if ("-bf".equals(opt) || "-baseline-format".equals(opt))
+					baselineFormat = argv[++i];
+				else if ("-cpo".equals(opt))
+					coordPreOpt = true;
+				else if ("-nx".equals(opt) || "-no-xshift".equals(opt))
+					replace.add("xshift_0...xshift_99999=0");
+				else if ("-o".equals(opt) || "-output-prefix".equals(opt))
+					outputPrefix = argv[++i];
+				else if ("-p".equals(opt) || "-preview".equals(opt))
+					preview = true;
+				else if ("-g".equals(opt) || "-gamma".equals(opt))
+					Global.gammaCorrection = Double.parseDouble(argv[++i]);
+				else if ("-s".equals(opt) || "-saturation".equals(opt))
+					Global.saturation = Double.parseDouble(argv[++i]);
+				else if ("-r".equals(opt) || "-replace".equals(opt))
+					replace.add(argv[++i]);
+				else if ("-seed".equals(opt))
+					Global.R = new Random(Long.parseLong(argv[++i]));
+				else
+					throw new RuntimeException("Unknown option: "+opt);
+			}
+		}
+		//Mode
 		Mode m = createMode(mode);
 		if (m!=null)
 		{
 			System.out.println("Mode: "+mode);
 			
+			//Format
 			if ("?".equals(format))
 			{
 				List<String> f = new ArrayList<>();
@@ -84,15 +93,43 @@ public class CL
 			} 
 			else if (format==null)
 				format = m.formats().get(0);
+			else
+				if (!m.formats().contains(format))
+					System.out.println("WARNING: Unsupported format: "+format);
 			System.out.println("Format: "+format);
 		}
 		
+		//Baseline
+		if (baseline!=null)
+		{
+			if (baselineFormat==null)
+				baselineFormat = format;
+			else
+				if (!m.formats().contains(baselineFormat))
+					System.out.println("WARNING: Unsupported format: "+baselineFormat);
+				
+			Utils.loadOutput(m, baselineFormat, baseline);
+		}
+		
+		//Dithering
 		Dithering d = createDithering(dithering);
 		if (d==null || m==null)
 			System.exit(0);
+		System.out.println("Dithering: "+dithering);
+		
+		//Output
+		if (input!=null && outputPrefix==null)
+		{
+			int dot = input.lastIndexOf('.');
+			if (dot>=0)
+				outputPrefix = input.substring(0,dot);
+			else
+				outputPrefix = input;
+		}
 		
 		Optimizer o = new Optimizer(m);
 		
+		//Var replacements
 		for (String rp : replace)
 		{
 			Map<Variable, Value> r = replacements(o,rp);
@@ -106,26 +143,67 @@ public class CL
 			o = new Optimizer(m);
 		}
 		
+		//Now convert
 		if (input!=null)
 		{
 			ImageImpl img = new ImageImpl(input);
-			optimize(img,img,o,m,d);
 			
+			optimize(img,img,o,m,d);			
+		}
+		else if (baseline==null)
+		{
+			System.out.println("No input image or baseline.");
+			List<String> vart = summarizeVars(o.vars());
+			System.out.println("Variables: "+vart);
+		}
+
+		if (outputPrefix!=null)
+		{
 			Utils.saveOutput(m, format, outputPrefix);
+			
 			if (preview)
 			{
-				ImageImpl p = new ImageImpl(img.xRange()[1]+1, img.yRange()[1]+1);
+				int[] dim = dimensions(m);
+				ImageImpl p = new ImageImpl(dim[0], dim[1]);
 				Utils.draw(m, p);
 				System.out.println("Saving "+outputPrefix+"_preview.png");
 				p.save(outputPrefix+"_preview.png", "png");
 			}
 		}
-		else
+	}
+	
+	private static int[] dimensions(Mode m)
+	{
+		int[] dim = {0,0};
+		for (Optimizable o : m.optimizables())
 		{
-			System.out.println("No input image.");
-			List<String> vart = summarizeVars(o.vars());
-			System.out.println("Variables: "+vart);
+			int x = o.x().get()+o.width();
+			int y = o.y().get()+o.heigt();
+			dim[0] = Math.max(dim[0], x);
+			dim[1] = Math.max(dim[1], y);
 		}
+		return dim;
+	}
+
+	private static void printHelp() 
+	{
+		System.out.println("dfliconv2 options:");
+		System.out.println("    -h                    : help message");
+		System.out.println("    -m <mode>             : graphic mode or ? for help");
+		System.out.println("    -f <format            : output format or ? for help");
+		System.out.println("    -d <dithering>        : dithering mode or ? for help");
+		System.out.println("    -i <input image>");
+		System.out.println("    -o <output prefix>");
+		System.out.println("    -p                    : save a .png preview image");
+		System.out.println("    -r <...>              : variable replacement");
+		System.out.println("    -g <gamma correction> : default is 1.0 for no correction");
+		System.out.println("    -s <saturation>       : default is 1.0 for no correction");
+		System.out.println("    -seed <random seed>");
+		System.out.println("    -b <baseline prefix>  : import previous conversion");
+		System.out.println("    -bf <baseline format> : format of baseline");
+		System.out.println("    -nx                   : no xshift optimization");
+		System.out.println("");
+		System.out.println("Long options are: -help, -mode, -format, -dithering, -input, -output-prefix, -preview, -replace, -gamma, -saturation, -baseline, -baseline-format, -no-xshift ");
 	}
 
 	private static List<String> summarizeVars(Collection<Variable> vars) 
@@ -137,13 +215,9 @@ public class CL
 			String t;
 			int i_ = n.indexOf('_');
 			if (i_>=0)
-			{
 				t = n.substring(0, i_+1)+n.substring(i_+1).replaceAll("[0-9]","X");
-			}
 			else
-			{
 				 t = n;
-			}
 			if (vart.containsKey(t))
 			{
 				String[] minmax = vart.get(t);
@@ -153,21 +227,15 @@ public class CL
 					minmax[1] = n;
 			}
 			else
-			{
 				vart.put(t, new String[]{n,n});
-			}
 		}
 		List<String> summ = new ArrayList<>();
 		for (String[] minmax : vart.values())
 		{
 			if (minmax[0].equals(minmax[1]))
-			{
 				summ.add(minmax[0]);
-			}
 			else
-			{
 				summ.add(minmax[0]+"..."+minmax[1]);
-			}
 		}
 		return summ;
 	}
@@ -198,9 +266,7 @@ public class CL
 		else if (dithering==null || "no".equals(dithering) || "none".equals(dithering))
 			d = new NoDithering();
 		else if ("?".equals(dithering))
-		{
 			System.out.println("Dithering methods: [no, point5, bayer2x2, bayer4x4, ord3x3, fs]");
-		}
 		return d;
 	}
 
@@ -208,39 +274,50 @@ public class CL
 	{
 		Dithering dopti = new NoDithering();
 		
-		System.out.print("Coordinate pre-optimization: ");
-		if(o.optimizeCoords(img_opti, dopti))
-			System.out.println("done");
-		else
-			System.out.println("no coordinate variables");
+		if (coordPreOpt)
+		{
+			System.out.print("Coordinate pre-optimization: ");
+			if(o.optimizeCoords(img_opti, dopti))
+				System.out.println("done");
+			else
+				System.out.println("no coordinate variables");
+		}
 		
-		boolean coord_opti = false;
+		int globals = 1000;
+		int locals = 1000;
 		
-		int p = 0;
+		int p = 1;
 		double err1 = Double.MAX_VALUE/2, err0 = err1*1.1;
 		int ceq = 0;
 		do
 		{
-			if (p%2==0)
+			err0 = err1;
+			switch(p%3)
 			{
-				System.out.println("phase (bf) "+ ++p);
-				err0 = err1;
-				err1 = Math.min(err1, o.optimizeBF(img_opti,dopti, coord_opti));//BF
-				coord_opti = true;
-				System.out.println("error: "+err1);
+				case 1:
+					System.out.println("phase (bf) "+ p);
+					err1 = Math.min(err1, o.optimizeBF(img_opti,dopti, p>=7, globals-->0, locals-->0));
+				break;
+				
+				case 2:
+					System.out.println("phase (md) "+ p);
+					err1 = Math.min(err1, o.optimizeLocalMultiDim(img_opti,dopti));
+				break;
+				
+				case 0:
+					System.out.println("phase (km) "+ p);
+					err1 = Math.min(err1, o.optimizeKM(img_opti,dopti));
+				break;
 			}
-			else
-			{
-				System.out.println("phase (km) "+ ++p);
-				err0 = err1;
-				err1 = Math.min(err1, o.optimizeKM(img_opti,dopti));
-			}
+			System.out.println("error: "+err1);
+			//o.printChanges();
+			p++;
 			if (err0>err1)
 				ceq=0;
 			else
 				ceq++;
 		} 
-		while (err0>err1 || ceq<2);
+		while (p<7 || err0>err1 || ceq<4);
 		o.optimizeKM(img_final,dopti);
 		o.resetUnusedColorVarables();
 		Utils.update(m, img_final, dfinal);
@@ -266,9 +343,8 @@ public class CL
 					throw new RuntimeException("Invalid varibale range: "+leftside);
 			}
 			else
-			{
 				lvs = filterVars(o.vars(),leftside,leftside);
-			}
+				
 			if (lvs.isEmpty())
 				throw new RuntimeException("No variables defined for: "+leftside);
 			//right side
@@ -276,13 +352,9 @@ public class CL
 			{
 				List<Variable> v = filterVars(o.vars(),rv,rv);
 				if (!v.isEmpty())
-				{
 					rvs.addAll(v);
-				}
 				else
-				{
 					rvs.add(ValueFactory.createConst(rv));
-				}
 			}
 			//Create mappings
 			lvs.sort(new Comparator<Variable>() 

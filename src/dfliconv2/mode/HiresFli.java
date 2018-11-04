@@ -3,6 +3,7 @@ package dfliconv2.mode;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -56,11 +57,11 @@ public class HiresFli implements Mode
 			{
 				color0[m][i] = Utils.randomize(new Plus4Color("color0_"+m+"_"+Utils.format(i,w*h)));
 				color1[m][i] = Utils.randomize(new Plus4Color("color1_"+m+"_"+Utils.format(i,w*h)));
-				luma[m].add(new Nibbles(new HighNibble(color1[m][i]),new HighNibble(color0[m][i])));
+				luma[m].add(new Nibbles(new HighNibble(color0[m][i]),new HighNibble(color1[m][i])));
 			}
 			for (int i = 0; i<w*h; i++)
 			{
-				chroma[m].add(new Nibbles(new LowNibble(color0[m][i]),new LowNibble(color1[m][i])));
+				chroma[m].add(new Nibbles(new LowNibble(color1[m][i]),new LowNibble(color0[m][i])));
 			}
 		}
 		for (int i = 0; i<w*h; i++)
@@ -86,16 +87,16 @@ public class HiresFli implements Mode
 
 	public void visit(VariableVisitor v) 
 	{
-		luma[0] = Utils.visitValue(luma[0], v);
-		luma[1] = Utils.visitValue(luma[1], v);
-		luma[2] = Utils.visitValue(luma[2], v);
-		luma[3] = Utils.visitValue(luma[3], v);
-		chroma[0] = Utils.visitValue(chroma[0], v);
-		chroma[1] = Utils.visitValue(chroma[1], v);
-		chroma[2] = Utils.visitValue(chroma[2], v);
-		chroma[3] = Utils.visitValue(chroma[3], v);
-		xshift = Utils.visitValue(xshift, v);
-		optiz = Utils.visitOptiz(optiz, v);
+		luma[0] = v.visitValues(luma[0]);
+		luma[1] = v.visitValues(luma[1]);
+		luma[2] = v.visitValues(luma[2]);
+		luma[3] = v.visitValues(luma[3]);
+		chroma[0] = v.visitValues(chroma[0]);
+		chroma[1] = v.visitValues(chroma[1]);
+		chroma[2] = v.visitValues(chroma[2]);
+		chroma[3] = v.visitValues(chroma[3]);
+		xshift = v.visitValues(xshift);
+		optiz = v.visitOptimizables(optiz);
 	}
 	
 	public int width()  { return w*8; }
@@ -103,7 +104,10 @@ public class HiresFli implements Mode
 
 	public List<String> formats()
 	{
-		return Arrays.asList("bin");
+		if (w==40 && h==25)
+			return Arrays.asList("prg","bin");
+		else
+			return Arrays.asList("bin");
 	}
 	
 
@@ -119,6 +123,27 @@ public class HiresFli implements Mode
 			}
 			fs.put("_bitmap.bin", bitmap);
 			fs.put("_xshift.bin", xshift);
+		}
+		else if (format.equals("prg"))
+		{
+			List<Value> prg = Utils.loadViewer("dfli.prg");
+			prg.addAll(Collections.nCopies(4, new Const(0x14)));
+			prg.addAll(Collections.nCopies(400, Const.ZERO));
+			for (Value xs : xshift)
+			{
+				prg.add(new Add(new Const(8),xs));
+			}
+			prg.addAll(bitmap);
+			prg.addAll(Collections.nCopies(192, Const.ZERO));
+			for (int m=0; m<4; m++)
+			{
+				prg.addAll(luma[m]);
+				prg.addAll(Collections.nCopies(24, Const.ZERO));
+				prg.addAll(chroma[m]);
+				if (m!=3)
+					prg.addAll(Collections.nCopies(24, Const.ZERO));
+			}
+			fs.put(".prg",prg);
 		}
 		return fs;
 	}

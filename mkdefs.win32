@@ -1,0 +1,22 @@
+
+JDK_HOME = D:/Program Files/Java/jdk1.8.0_121/bin
+JAVAC = "$(JDK_HOME)/javac.exe"
+JAVA = "$(JDK_HOME)/java.exe"
+JAR = "$(JDK_HOME)/jar.exe" cf
+EXO = "D:/CrossDev/exomizer209/win32/exomizer.exe"
+MKD64 = "D:/CrossDev/mkd64_1_3b_win32/mkd64.exe"
+PLUS4 = "D:/CrossDev/plus4emu/plus4emu.exe"
+#PLUS4 = "D:/CrossDev/yape1.1.2/yape.exe"
+C64 = "D:/Program Files (x86)/WinVICE/x64.exe"
+ASS = ass.bat
+RM = rm
+
+P4FLICONV = "D:/CrossDev/plus4emu/p4fliconv.exe"
+
+
+LIB = classes.jar
+
+CA = D:/CrossDev/cc65-win32-2.13.3-1/bin/ca65.exe
+LD = D:/CrossDev/cc65-win32-2.13.3-1/bin/ld65.exe
+
+EMU = $(PLUS4)

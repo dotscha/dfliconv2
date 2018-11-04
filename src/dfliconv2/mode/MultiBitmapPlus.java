@@ -107,12 +107,12 @@ public class MultiBitmapPlus implements Mode
 
 	public void visit(VariableVisitor v) 
 	{
-		luma = Utils.visitValue(luma, v);
-		chroma = Utils.visitValue(chroma, v);
-		color0 = Utils.visitValue(color0,v);
-		color3 = Utils.visitValue(color3,v);
-		xshift = Utils.visitValue(xshift,v);
-		optiz = Utils.visitOptiz(optiz, v);
+		luma = v.visitValues(luma);
+		chroma = v.visitValues(chroma);
+		color0 = v.visitValues(color0);
+		color3 = v.visitValues(color3);
+		xshift = v.visitValues(xshift);
+		optiz = v.visitOptimizables(optiz);
 	}
 	
 	public int width()  { return w*8; }
@@ -120,10 +120,15 @@ public class MultiBitmapPlus implements Mode
 
 	public List<String> formats()
 	{
-		if (w==40 && h==25 && xshift.isEmpty())
-			return Arrays.asList("prg","boti","bin");
-		else
-			return Arrays.asList("bin");
+		List<String> fs = new ArrayList<>();
+		if (w==40 && h==25)
+		{
+			fs.add("prg");
+			if (xshift.isEmpty())
+				fs.add("boti");
+		}
+		fs.add("bin");
+		return fs;
 	}
 	
 
@@ -148,16 +153,26 @@ public class MultiBitmapPlus implements Mode
 		}
 		else if (format.equals("prg"))
 		{
-			List<Value> prg = Utils.loadPrg("mc.prg");
-			prg.addAll(luma);
-			prg.addAll(Collections.nCopies(24, new Const(0)));
-			prg.addAll(chroma);		
-			prg.addAll(Collections.nCopies(24, new Const(0)));
+			List<Value> prg = Utils.loadViewer("dfli.prg");
+			prg.add(new Const(0x14));
+			prg.addAll(Collections.nCopies(3, new Const(0x3f)));
+			for (int y = 0; y<200; y++)
+				prg.add(color0.get(y%color0.size()));
+			for (int y = 0; y<200; y++)
+				prg.add(color3.get(y%color3.size()));
+			if (xshift.isEmpty())
+				prg.addAll(Collections.nCopies(200, new Const(0x18)));
+			else
+				for (Value xs : xshift)
+				{
+					prg.add(new Add(new Const(0x18),xs));
+				}
 			prg.addAll(bitmap);
-			prg.addAll(Collections.nCopies(24*8, new Const(0)));
-			prg.add(color0.get(0));
-			prg.add(color3.get(0));
-			fs.put(".prg", prg);
+			prg.addAll(Collections.nCopies(192, Const.ZERO));
+			prg.addAll(luma);
+			prg.addAll(Collections.nCopies(24, Const.ZERO));
+			prg.addAll(chroma);
+			fs.put(".prg",prg);
 		}
 		else if (format.equals("boti"))
 		{

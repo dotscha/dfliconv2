@@ -5,6 +5,10 @@ import dfliconv2.VariableVisitor;
 
 public class Const extends Value 
 {
+	public static final Const ZERO = new Const(0);
+	public static final Const ONE = new Const(1);
+	public static final Const TWO = new Const(2);
+	
 	private int c;
 	
 	public Const(int c) 

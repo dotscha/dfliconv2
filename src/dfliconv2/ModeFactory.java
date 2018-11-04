@@ -19,6 +19,7 @@ public class ModeFactory
 		register("multi", MultiBitmap.class);
 		register("multi+", MultiBitmapPlus.class);
 		register("multi-dfli", MCFli.class);
+		register("gfli", GenericFli.class);
 	}
 	
 	private static void register(String name, Class<? extends Mode> clazz)
@@ -75,7 +76,7 @@ public class ModeFactory
 						if (pstr.startsWith("'") && pstr.endsWith("'"))
 						{
 							for (int i = 1; i<pstr.length()-1; i++)
-							ps.add((int)pstr.charAt(i));
+								ps.add((int)pstr.charAt(i));
 						}
 						else
 							ps.add(Integer.parseInt(pstr));
@@ -88,6 +89,7 @@ public class ModeFactory
 						return (Mode) ct.newInstance(ps.toArray());
 					}
 				}
+				throw new RuntimeException("No mode constuctor found for "+mode);
 			} 
 			catch (Exception e) 
 			{
@@ -96,6 +98,5 @@ public class ModeFactory
 		}
 		else
 			throw new RuntimeException("Unknown mode: "+mode);
-		return null;
 	}
 }

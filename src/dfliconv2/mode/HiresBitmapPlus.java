@@ -2,6 +2,7 @@ package dfliconv2.mode;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -88,10 +89,10 @@ public class HiresBitmapPlus implements Mode
 	
 	public void visit(VariableVisitor v) 
 	{
-		luma = Utils.visitValue(luma, v);
-		chroma = Utils.visitValue(chroma, v);
-		xshift = Utils.visitValue(xshift, v);
-		optiz = Utils.visitOptiz(optiz, v);
+		luma = v.visitValues(luma);
+		chroma = v.visitValues(chroma);
+		xshift = v.visitValues(xshift);
+		optiz = v.visitOptimizables(optiz);
 	}
 	
 	public int width()  { return w*8; }
@@ -99,6 +100,9 @@ public class HiresBitmapPlus implements Mode
 	
 	public List<String> formats()
 	{
+		if (w==40 && h==25)
+			return Arrays.asList("prg","bin");
+		else
 			return Arrays.asList("bin");
 	}
 	
@@ -112,6 +116,23 @@ public class HiresBitmapPlus implements Mode
 			fs.put("_bitmap.bin", bitmap);
 			if (!xshift.isEmpty())
 				fs.put("_xshift.bin", xshift);
+		} 
+		else if (format.equals("prg"))
+		{
+			List<Value> prg = Utils.loadViewer("dfli.prg");
+			prg.add(new Const(0x14));
+			prg.addAll(Collections.nCopies(3, new Const(0x3f)));
+			prg.addAll(Collections.nCopies(400, Const.ZERO));
+			for (Value xs : xshift)
+			{
+				prg.add(new Add(new Const(8),xs));
+			}
+			prg.addAll(bitmap);
+			prg.addAll(Collections.nCopies(192, Const.ZERO));
+			prg.addAll(luma);
+			prg.addAll(Collections.nCopies(24, Const.ZERO));
+			prg.addAll(chroma);
+			fs.put(".prg",prg);
 		}
 		return fs;
 	}
