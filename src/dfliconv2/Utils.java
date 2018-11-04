@@ -100,6 +100,7 @@ public class Utils
 	public static void loadOutput(Mode m, String format, String prefix) throws IOException
 	{
 		List<Optimizable> optiz = new ArrayList<>();
+		System.out.println("Baseline format: "+format);
 		for (Entry<String, List<Value>> e : m.files(format).entrySet())
 		{
 			String fn = prefix+e.getKey();

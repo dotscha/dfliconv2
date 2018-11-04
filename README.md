@@ -20,14 +20,17 @@ I don't want to deal with resizing the image to the dimensions of the given grap
 
 ## How does the conversion work?
 
-Three optimization algorithms are implemented at the moment:
+All conversion begins by creating baseline image of the given graphic mode. The baseline is either created randomly or a previous
+conversion result is imported by the user (see -b and -bf options).
+Than multipe optimization algorithms are run repeatedly:
 
  * Coordinate pre-optimization is used to fine tune coordinate shifts (like xshift) to reduce the average number of distinct colors per cell (like character) that exceed the capacity of the given graphic mode.
  * One dimensional brute-force algorithm that tries every possible value of every variable, evaluates the conversion error and keeps the values resulting less error.
+ * Two-three dimensional brute-force algorithm that tries every possible variation of certain type of variables if the overall number of variations does not exceed 256.
  * K-Means like optimization that tries to find partitions of the pixels whose means are close to possible palette colors.
 
 Those are combined/iterated until the conversion error cannot be reduced further.
-The initial state for the optimization process is randomly generated, so almost every conversion will yield slightly different results. Use the `-seed <integer>` option to make it deterministic.
+If the baseline is randomly generated almost every conversion will yield slightly different results. Use the `-seed <integer>` option to make it deterministic.
 
 ## Examples 
 
@@ -37,7 +40,11 @@ The initial state for the optimization process is randomly generated, so almost 
 
 ### Simple conversion examples
 
-To hires, saving `output.prg` and `output_preview.png` ("output" is the default output file prefix):
+Convert to multi-dfli with preview .png without dithering:
+
+`> dfliconv2 image.jpg`
+
+To hires, saving `image.prg` and `image_preview.png` (the input without file extension is the output file prefix by default):
 
 `> dfliconv2 -m hires -i image.jpg -p`
 
@@ -45,13 +52,37 @@ To multi, using Bayer4x4 dithering, saving `converted.prg` and `converted_previe
 
 `> dfliconv2 -m multi -d bayer4x4 -i image.jpg -o converted -p`
 
+To generic multi fli mode with badline config 'clllllll':
+
+`> dfliconv2 -m gfli('m','clllllll') -d point5 -i image.jpg -p`
+
+### Conversion between formats
+
+It is possible to load a previous conversion results or images in supported formats as a baseline and save them in another format and/or create a .png preview for them.
+Let's suppose you have `pic_boti.prg` in Multi Botticelli format and you want to create a .prg viewer for it:
+
+`> dfliconv2 -m multi -f prg -b pic -bf boti`
+
+or you can create only a `pic_preview.png` too:
+
+`> dfliconv2 -m multi -f none -b pic -bf boti -p`
+
 ### Supported graphic modes
 
 Get the list of supported modes by running
 
 `> dfliconv2 -m ?`
 
-The list will include parameterized modes too, like `hires(w,h)` where `w` and `h` stands for width and height in characters.
+The current list is:
+ * hires, hires(w,h)
+ * hires+, hires+(w,h)
+ * hires-dfli, hires-dfli(w,h)
+ * multi, multi(w,h)
+ * multi+, multi+(w,h)
+ * multi-dfli, multi-dfli(w,h)
+ * gfli(m,dma0,dma1,dma2,dma3,dma4,dma5,dma6,dma7), gfli(w,h,m,dma0,dma1,dma2,dma3,dma4,dma5,dma6,dma7)
+
+The list includes parameterized modes too, like `hires(w,h)` where `w` and `h` stands for width and height in characters.
 So, for example `-m "hires(80,25)"` means hires bitmap of dimensions 640x200, ie. a double screen hires mode.
 New graphic modes will be added incrementally.
 
@@ -62,7 +93,8 @@ Try running a command like below to get the supported output formats for a given
 `> dfliconv2 -m hires -f ?`
 
 The `bin` format is supported for every native modes, that will save separate files for luma, chroma, bitmap, etc.
-Not all supported modes have a executable `prg` format yet, maybe never will, let me know if you want to contribute.
+Not all supported modes have a executable `prg` format yet, like `prg` is not supported yet for any of the custom size modes.
+`boti` is supported for default size `hires` and `multi` modes.
 
 ### Supported dithering methods
 
@@ -116,5 +148,3 @@ You can use the `-g` and `-s` options to do gamma correction and change the satu
  * option for loading custom palette, option to define what is "close" color.
  * user defined graphic modes with some examples (eg. some c64 modes)
  * add more graphic modes, including character modes with optimized charset to approximate the picture with 256 chars.
- * add more native .prg viewers
- * add an optimization algorithm that recognizes "local" and "global" variables and runs quick local optimizations after every global variable change to figure out what is a better global value.

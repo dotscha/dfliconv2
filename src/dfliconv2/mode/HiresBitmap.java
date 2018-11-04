@@ -58,7 +58,7 @@ public class HiresBitmap extends HiresBitmapPlus
 			file.addAll(chroma);
 			file.addAll(Collections.nCopies(24, new Const(0)));
 			file.addAll(bitmap);
-			fs.put(".prg",file);
+			fs.put("_boti.prg",file);
 		}
 		return fs;
 	}

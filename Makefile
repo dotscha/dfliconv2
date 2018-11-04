@@ -22,10 +22,10 @@ $(LIB) : $(JAVA_SRC) src/viewer/gfli.prg src/viewer/dfli.prg
 	$(JAR) $(LIB) -C $(JAVA_BIN) . -C src viewer
 
 test: $(LIB)
-	#$(JAVA) -cp $(LIB) dfliconv2.CL -i tiger.jpg -m hires -s 2 -p -d point5 -o tiger_h
-	#$(JAVA) -cp $(LIB) dfliconv2.CL -i tiger.jpg -m hires+ -s 2 -p -d point5 -o tiger_hp
-	#$(JAVA) -cp $(LIB) dfliconv2.CL -i tiger.jpg -m multi -s 2 -p -d point5 -o tiger_m
-	#$(JAVA) -cp $(LIB) dfliconv2.CL -i tiger.jpg -m multi+ -s 2 -p -d point5 -o tiger_mp
+	$(JAVA) -cp $(LIB) dfliconv2.CL -i tiger.jpg -m hires -s 2 -p -d point5 -o tiger_h
+	$(JAVA) -cp $(LIB) dfliconv2.CL -i tiger.jpg -m hires+ -s 2 -p -d point5 -o tiger_hp
+	$(JAVA) -cp $(LIB) dfliconv2.CL -i tiger.jpg -m multi -s 2 -p -d point5 -o tiger_m
+	$(JAVA) -cp $(LIB) dfliconv2.CL -i tiger.jpg -m multi+ -s 2 -p -d point5 -o tiger_mp
 	$(JAVA) -cp $(LIB) dfliconv2.CL -i tiger.jpg -m multi-dfli -s 2 -p -d point5 -o tiger_mdfli
 	$(JAVA) -cp $(LIB) dfliconv2.CL -i tiger.jpg -m hires-dfli -s 2 -p -d point5 -o tiger_hdfli
 

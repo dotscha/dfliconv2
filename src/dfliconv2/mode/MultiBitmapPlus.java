@@ -168,9 +168,9 @@ public class MultiBitmapPlus implements Mode
 					prg.add(new Add(new Const(0x18),xs));
 				}
 			prg.addAll(bitmap);
-			prg.addAll(Collections.nCopies(192, Const.ZERO));
+			prg.addAll(Collections.nCopies(192,Const.ZERO));
 			prg.addAll(luma);
-			prg.addAll(Collections.nCopies(24, Const.ZERO));
+			prg.addAll(Collections.nCopies(24,Const.ZERO));
 			prg.addAll(chroma);
 			fs.put(".prg",prg);
 		}
@@ -180,8 +180,7 @@ public class MultiBitmapPlus implements Mode
 			file.add(new Const(0x00));
 			file.add(new Const(0x78));
 			file.addAll(luma);
-			for (int i = 0; i<24-6; i++)
-				file.add(new Const(0));
+			file.addAll(Collections.nCopies(24-6,Const.ZERO));
 			file.add(new Const(0x4d));//M
 			file.add(new Const(0x55));//U
 			file.add(new Const(0x4c));//L
@@ -189,10 +188,9 @@ public class MultiBitmapPlus implements Mode
 			file.add(new Nibbles(new LowNibble(color3.get(0)),new HighNibble(color3.get(0))));
 			file.add(new Nibbles(new LowNibble(color0.get(0)),new HighNibble(color0.get(0))));
 			file.addAll(chroma);
-			for (int i = 0; i<24; i++)
-				file.add(new Const(0));
+			file.addAll(Collections.nCopies(24,Const.ZERO));
 			file.addAll(bitmap);
-			fs.put(".prg",file);
+			fs.put("_boti.prg",file);
 		}
 		return fs;
 	}

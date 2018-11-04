@@ -111,11 +111,14 @@ public class CL
 			Utils.loadOutput(m, baselineFormat, baseline);
 		}
 		
+		if (m==null)
+		{
+			System.out.println("No mode is specified (-m), nothing to do, exiting.");
+			System.exit(0);
+		}
+
 		//Dithering
 		Dithering d = createDithering(dithering);
-		if (d==null || m==null)
-			System.exit(0);
-		System.out.println("Dithering: "+dithering);
 		
 		//Output
 		if (input!=null && outputPrefix==null)
@@ -146,6 +149,8 @@ public class CL
 		//Now convert
 		if (input!=null)
 		{
+			System.out.println("Dithering: "+dithering);
+			
 			ImageImpl img = new ImageImpl(input);
 			
 			optimize(img,img,o,m,d);			
@@ -156,6 +161,9 @@ public class CL
 			List<String> vart = summarizeVars(o.vars());
 			System.out.println("Variables: "+vart);
 		}
+		
+		if (input==null && baseline!=null && outputPrefix==null)
+			outputPrefix = baseline;
 
 		if (outputPrefix!=null)
 		{
@@ -192,16 +200,16 @@ public class CL
 		System.out.println("    -m <mode>             : graphic mode or ? for help");
 		System.out.println("    -f <format            : output format or ? for help");
 		System.out.println("    -d <dithering>        : dithering mode or ? for help");
-		System.out.println("    -i <input image>");
-		System.out.println("    -o <output prefix>");
+		System.out.println("    -i <input image>      : input image file");
+		System.out.println("    -o <output prefix>    : prefix of the output file(s)");
 		System.out.println("    -p                    : save a .png preview image");
 		System.out.println("    -r <...>              : variable replacement");
 		System.out.println("    -g <gamma correction> : default is 1.0 for no correction");
 		System.out.println("    -s <saturation>       : default is 1.0 for no correction");
-		System.out.println("    -seed <random seed>");
+		System.out.println("    -seed <random seed>   : set random seed");
 		System.out.println("    -b <baseline prefix>  : import previous conversion");
 		System.out.println("    -bf <baseline format> : format of baseline");
-		System.out.println("    -nx                   : no xshift optimization");
+		System.out.println("    -nx                   : disable xshift optimization");
 		System.out.println("");
 		System.out.println("Long options are: -help, -mode, -format, -dithering, -input, -output-prefix, -preview, -replace, -gamma, -saturation, -baseline, -baseline-format, -no-xshift ");
 	}
@@ -265,8 +273,15 @@ public class CL
 			d = new FS();
 		else if (dithering==null || "no".equals(dithering) || "none".equals(dithering))
 			d = new NoDithering();
-		else if ("?".equals(dithering))
+		else
+		{
 			System.out.println("Dithering methods: [no, point5, bayer2x2, bayer4x4, ord3x3, fs]");
+			if (!"?".equals(dithering))
+			{
+				System.out.println("Unsupported dithering: "+dithering);
+				System.exit(0);
+			}
+		}
 		return d;
 	}
 
