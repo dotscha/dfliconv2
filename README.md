@@ -148,3 +148,7 @@ You can use the `-g` and `-s` options to do gamma correction and change the satu
  * option for loading custom palette, option to define what is "close" color.
  * user defined graphic modes with some examples (eg. some c64 modes)
  * add more graphic modes, including character modes with optimized charset to approximate the picture with 256 chars.
+
+### Credits
+
+ * I have stolen the RGB-to-Lab conversion code from Larry's disassembled converter. :)
