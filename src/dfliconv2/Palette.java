@@ -1,5 +1,10 @@
 package dfliconv2;
 
+import java.awt.Graphics;
+import java.awt.image.BufferedImage;
+import java.io.File;
+import java.io.IOException;
+
 import dfliconv2.color.RGB;
 
 public class Palette 
@@ -136,13 +141,51 @@ public class Palette
 				237,255,188
 			};
 	
-	private static Color[] palette;
+	private static java.awt.Color[] awtPalette = new java.awt.Color[128];
+	private static Color[] palette = new Color[128];
 	
 	static
 	{
-		palette = new Color[128];
 		for (int i = 0; i<128; i++)
-			palette[i] = Global.paletteColor(new RGB(plus4Pal[3*i+0]/256.0,plus4Pal[3*i+1]/256.0,plus4Pal[3*i+2]/256.0));
+		{
+			awtPalette[i] = new java.awt.Color(plus4Pal[3*i+0],plus4Pal[3*i+1],plus4Pal[3*i+2]);
+			palette[i] = Global.paletteColor(new RGB(awtPalette[i].getRGB()));
+		}
+	}
+	
+	public static void loadPal(String file) throws IOException
+	{
+		BufferedImage pal = javax.imageio.ImageIO.read(new File(file));
+		int w = pal.getWidth();
+		int h = pal.getHeight();
+		for (int luma = 0; luma<8; luma++)
+		{
+			int y = (2*luma+1)*h/16;
+			for (int chroma = 0; chroma<16; chroma++)
+			{
+				int x = (2*chroma+1)*w/32;
+				awtPalette[luma*16+chroma] = new java.awt.Color(pal.getRGB(x,y));
+				palette[luma*16+chroma] = Global.paletteColor(new RGB(pal.getRGB(x,y)));
+			}
+		}
+	}
+	
+	public static void savePal(String file) throws IOException
+	{
+		BufferedImage pal = new BufferedImage(256, 128, BufferedImage.TYPE_INT_ARGB);
+		Graphics g = pal.getGraphics();
+		for (int luma = 0; luma<8; luma++)
+		{
+			int y = luma*16;
+			for (int chroma = 0; chroma<16; chroma++)
+			{
+				int x = chroma*16;
+				g.setColor(getAwtColor(luma*16+chroma));
+				for (int i = 0; i<256; i++)
+					g.drawLine(x+i%16, y+i/16, x+i%16, y+i/16);
+			}
+		}
+		javax.imageio.ImageIO.write(pal, "png", new File(file));
 	}
 
 	public static Color getColor(int i)
@@ -152,7 +195,7 @@ public class Palette
 	
 	public static java.awt.Color getAwtColor(int i)
 	{
-		return new java.awt.Color(plus4Pal[3*i+0],plus4Pal[3*i+1],plus4Pal[3*i+2]);
+		return awtPalette[i];
 	}
 	
 	public static int getColosestPalIndex(Color c)
@@ -169,5 +212,10 @@ public class Palette
             }
         }
         return best;
+	}
+	
+	public static void main(String[] args) throws IOException 
+	{
+		savePal("TED-default.png");
 	}
 }

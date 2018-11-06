@@ -72,6 +72,8 @@ public class CL
 					replace.add(argv[++i]);
 				else if ("-seed".equals(opt))
 					Global.R = new Random(Long.parseLong(argv[++i]));
+				else if ("-pal".equals(opt))
+					Palette.loadPal(argv[++i]);
 				else
 					throw new RuntimeException("Unknown option: "+opt);
 			}
@@ -210,6 +212,7 @@ public class CL
 		System.out.println("    -b <baseline prefix>  : import previous conversion");
 		System.out.println("    -bf <baseline format> : format of baseline");
 		System.out.println("    -nx                   : disable xshift optimization");
+		System.out.println("    -pal <palette image>  : load palette from image");
 		System.out.println("");
 		System.out.println("Long options are: -help, -mode, -format, -dithering, -input, -output-prefix, -preview, -replace, -gamma, -saturation, -baseline, -baseline-format, -no-xshift ");
 	}

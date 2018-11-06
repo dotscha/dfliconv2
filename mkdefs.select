@@ -18,8 +18,8 @@ endif
 		| sed 's/\.endproc/    endproc/' \
 		| sed 's/\.if/    if/' \
 		| sed 's/\.else/    else/' \
-		| sed 's/\.ifdef/    if/' \
-		| sed 's/\.ifndef/    if/' \
+		| sed 's/\.ifdef/    ifdef/' \
+		| sed 's/\.ifndef/    ifndef/' \
 		| sed 's/\.endif/    endif/' \
 		| sed 's/\.byte/byt/' > $@
 
