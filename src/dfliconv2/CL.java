@@ -84,19 +84,19 @@ public class CL
 		{
 			System.out.println("Mode: "+mode);
 			
+			List<String> fs = new ArrayList<>();
+			fs.add("none");
+			fs.addAll(m.formats());
 			//Format
 			if ("?".equals(format))
 			{
-				List<String> f = new ArrayList<>();
-				f.add("none");
-				f.addAll(m.formats());
-				System.out.println("Formats: "+f);
+				System.out.println("Formats: "+fs);
 				System.exit(0);
 			} 
 			else if (format==null)
 				format = m.formats().get(0);
 			else
-				if (!m.formats().contains(format))
+				if (!fs.contains(format))
 					System.out.println("WARNING: Unsupported format: "+format);
 			System.out.println("Format: "+format);
 		}

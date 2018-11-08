@@ -14,6 +14,7 @@ import dfliconv2.Utils;
 import dfliconv2.Value;
 import dfliconv2.Variable;
 import dfliconv2.VariableVisitor;
+import dfliconv2.format.P4FliViewer;
 import dfliconv2.optimizable.MultiPixels;
 import dfliconv2.value.Add;
 import dfliconv2.value.Const;
@@ -112,10 +113,13 @@ public class MCFli implements Mode
 
 	public List<String> formats()
 	{
+		List<String> fs = new ArrayList<>();
 		if (w==40 && h==25)
-			return Arrays.asList("prg","bin");
-		else
-			return Arrays.asList("bin");
+			fs.add("prg");
+		fs.add("bin");
+		if (w==40 && 15<h && h<32)
+			fs.add("p4fli");
+		return fs;
 	}
 
 	public Map<String,List<Value>> files(String format) 
@@ -155,6 +159,24 @@ public class MCFli implements Mode
 			}
 			fs.put(".prg",prg);
 		}
+		else if (format.equals("p4fli"))
+		{
+			P4FliViewer v = new P4FliViewer();
+			v.setHeight(h*8);
+			v.setColor0(color0);
+			v.setColor3(color3);
+			List<Value> xsh = new ArrayList<>();
+			for (Value xs : xshift)
+			{
+				xsh.add(new Add(new Const(0x18),xs));
+			}
+			v.setXShift(xsh);
+			for (int m=0; m<4; m++)
+				v.setColors(luma[m], chroma[m], m);
+			v.setBitmap(bitmap);
+			fs.put("_p4fli.prg",v.prg());
+		}
+		
 		return fs;
 	}
 

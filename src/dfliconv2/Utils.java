@@ -115,10 +115,13 @@ public class Utils
 					if (b>=0)
 						optiz.add(new BitError(v,b));
 					else
-						throw new RuntimeException("File too short: "+fn);
+					{
+						System.out.println("WARNING: File too short: "+fn);
+						break;
+					}
 				}
 				if (f.read()>=0)
-					throw new RuntimeException("File too long: "+fn);
+					System.out.println("WARNING: File too long: "+fn);
 			}
 			finally
 			{
