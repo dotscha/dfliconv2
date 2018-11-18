@@ -145,10 +145,11 @@ You can use the `-g` and `-s` options to do gamma correction and change the satu
 ### Plans
 
  * add separate options for pre-dithering and post-dithering. The idea is that a pre-dithered image is used to optimize colors and post-dithering is used to create the actual output.
- * option for loading custom palette, option to define what is "close" color.
+ * option to define what is "close" color.
  * user defined graphic modes with some examples (eg. some c64 modes)
  * add more graphic modes, including character modes with optimized charset to approximate the picture with 256 chars.
 
 ### Credits
 
- * I have stolen the RGB-to-Lab conversion code from Larry's disassembled converter. :)
+ * I have stolen the RGB-to-Lab conversion routine from Larry's fantastic converter's disassembled source code. :)
+ * I use IstvanV's great P4FliConverter's DFLI viewer routine as it is.
