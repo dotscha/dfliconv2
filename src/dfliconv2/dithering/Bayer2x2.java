@@ -9,10 +9,8 @@ public class Bayer2x2 extends OrderedBase
 		super(max);
 	}
 
-	public int dim() 
-	{
-		return 2;
-	}
+	public int dimx() { return 2; }
+	public int dimy() { return 2; }
 
 	public int[] matrix() 
 	{

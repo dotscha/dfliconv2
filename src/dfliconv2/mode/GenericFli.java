@@ -11,6 +11,7 @@ import dfliconv2.Mode;
 import dfliconv2.Optimizable;
 import dfliconv2.Utils;
 import dfliconv2.Value;
+import dfliconv2.Variable;
 import dfliconv2.VariableVisitor;
 import dfliconv2.optimizable.HiresPixels;
 import dfliconv2.optimizable.MultiPixels;
@@ -33,6 +34,7 @@ public class GenericFli implements Mode
 	protected List<Value> xshift = new ArrayList<>();
 	protected List<Value> bitmap = new ArrayList<>();
 	protected List<Optimizable> optiz = new ArrayList<>();
+	private Value border;
 	
 	protected int[] dmas;
 	
@@ -51,6 +53,8 @@ public class GenericFli implements Mode
 	{
 		this.w = w;
 		this.h = h;
+		this.border = new Plus4Color("border");
+		((Variable)border).set(0);
 		dmas =  new int[] {dma0,dma1,dma2,dma3,dma4,dma5,dma6,dma7};
 		String a = m=='m' ? "1" : "0";
 		String b = m=='m' ? "2" : "1";
@@ -211,6 +215,7 @@ public class GenericFli implements Mode
 		if (format.equals("prg"))
 		{
 			List<Value> prg = Utils.loadViewer("gfli.prg");
+			prg.add(border);
 			for (int y = 0; y<h*8; y++)
 			{
 				int l = y+4;
@@ -264,5 +269,6 @@ public class GenericFli implements Mode
 		color0 = v.visitValues(color0);
 		color3 = v.visitValues(color3);
 		optiz = v.visitOptimizables(optiz);
+		border = border.visit(v);
 	}
 }

@@ -11,6 +11,7 @@ import dfliconv2.Mode;
 import dfliconv2.Optimizable;
 import dfliconv2.Utils;
 import dfliconv2.Value;
+import dfliconv2.Variable;
 import dfliconv2.VariableVisitor;
 import dfliconv2.optimizable.HiresPixels;
 import dfliconv2.value.Add;
@@ -29,6 +30,7 @@ public class HiresBitmapPlus implements Mode
 	protected List<Value> bitmap = new ArrayList<>();
 	protected List<Value> xshift = new ArrayList<>();
 	protected List<Optimizable> optiz = new ArrayList<>();
+	private Value border;
 	protected int w,h;
 
 	public HiresBitmapPlus()
@@ -45,6 +47,8 @@ public class HiresBitmapPlus implements Mode
 	{
 		this.w = w;
 		this.h = h;
+		this.border = new Plus4Color("border");
+		((Variable)border).set(0);
 		Value[] color0 = new Value[w*h];
 		Value[] color1 = new Value[w*h];
 		if (xs)
@@ -93,6 +97,7 @@ public class HiresBitmapPlus implements Mode
 		chroma = v.visitValues(chroma);
 		xshift = v.visitValues(xshift);
 		optiz = v.visitOptimizables(optiz);
+		border = border.visit(v);
 	}
 	
 	public int width()  { return w*8; }
@@ -122,6 +127,7 @@ public class HiresBitmapPlus implements Mode
 			List<Value> prg = Utils.loadViewer("dfli.prg");
 			prg.add(new Const(0x14));
 			prg.addAll(Collections.nCopies(3, new Const(0x3f)));
+			prg.add(border);
 			prg.addAll(Collections.nCopies(400, Const.ZERO));
 			for (Value xs : xshift)
 			{

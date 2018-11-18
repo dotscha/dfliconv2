@@ -1,21 +1,21 @@
 package dfliconv2.dithering;
 
-public class Bayer4x4 extends OrderedBase 
+public class Ord2x4 extends OrderedBase 
 {
 	private static final int[] MATRIX = 
 		{
-			 0,  8,  2, 10,
-			12,  4, 14,  6,
-			 3, 11,  1,  9,
-			15,  7, 13,  5,
+			 0,  1,
+			 2,  3,
+			 1,  0,
+			 3,  2
 		};
 
-	public Bayer4x4(double max)
+	public Ord2x4(double max)
 	{
 		super(max);
 	}
 
-	public int dimx() { return 4; }
+	public int dimx() { return 2; }
 	public int dimy() { return 4; }
 
 	public int[] matrix() 

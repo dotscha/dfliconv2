@@ -38,6 +38,8 @@ bitmap = $c000
 	lda #hi(irq)
 	sta $ffff
 	
+	lda border
+	sta $ff19
 	
 	inc $ff09
 	cli
@@ -179,7 +181,8 @@ dest_hi = *+2
 	
 data:
 
-tab06   = data
+border  = data
+tab06   = border+1
 tab07   = tab06+200
 tabc03  = tab07+200
 colors0 = tabc03+201

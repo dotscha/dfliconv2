@@ -19,7 +19,7 @@ public class Utils
 		FileOutputStream out = new FileOutputStream(name);
 		System.out.println("Saving "+name);
 		for (Value v : data)
-			out.write(v.get());
+			out.write(Math.min(255,Math.max(0,v.get())));
 		out.close();
 	}
 

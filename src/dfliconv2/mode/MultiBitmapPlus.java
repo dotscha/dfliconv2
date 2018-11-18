@@ -32,6 +32,7 @@ public class MultiBitmapPlus implements Mode
 	private List<Value> color0 = new ArrayList<>();
 	private List<Value> color3 = new ArrayList<>();
 	private List<Value> xshift = new ArrayList<>();
+	private Value border;
 
 	private List<Optimizable> optiz = new ArrayList<>();
 	private int w,h;
@@ -50,6 +51,8 @@ public class MultiBitmapPlus implements Mode
 	{
 		this.w = w;
 		this.h = h;
+		this.border = new Plus4Color("border");
+		((Variable)border).set(0);
 		Value[] color1 = new Value[w*h];
 		Value[] color2 = new Value[w*h];
 		if (plus)
@@ -113,6 +116,7 @@ public class MultiBitmapPlus implements Mode
 		color3 = v.visitValues(color3);
 		xshift = v.visitValues(xshift);
 		optiz = v.visitOptimizables(optiz);
+		border = border.visit(v);
 	}
 	
 	public int width()  { return w*8; }
@@ -156,6 +160,7 @@ public class MultiBitmapPlus implements Mode
 			List<Value> prg = Utils.loadViewer("dfli.prg");
 			prg.add(new Const(0x14));
 			prg.addAll(Collections.nCopies(3, new Const(0x3f)));
+			prg.add(border);
 			for (int y = 0; y<200; y++)
 				prg.add(color0.get(y%color0.size()));
 			for (int y = 0; y<200; y++)

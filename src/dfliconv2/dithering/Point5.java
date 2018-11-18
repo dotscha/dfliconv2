@@ -32,9 +32,9 @@ public class Point5 extends Base
 				}
 				else
 				{
-					Color cj = Palette.getColor(colors[j]);
-					if (ci.d2(cj)>max2)
+					if (Palette.dist(colors[i],colors[j])>max2)
 						continue;
+					Color cj = Palette.getColor(colors[j]);
 					cij = new Color((ci.c0+cj.c0)/2,(ci.c1+cj.c1)/2,(ci.c2+cj.c2)/2);
 				}
 				double error = cij.d2(p0,p1,p2);

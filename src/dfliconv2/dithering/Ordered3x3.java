@@ -12,10 +12,8 @@ public class Ordered3x3 extends OrderedBase
 		super(max);
 	}
 
-	public int dim() 
-	{
-		return 3;
-	}
+	public int dimx() { return 3; }
+	public int dimy() { return 3; }
 
 	public int[] matrix() 
 	{

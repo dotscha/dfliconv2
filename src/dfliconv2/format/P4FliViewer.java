@@ -227,6 +227,11 @@ public class P4FliViewer {
 			prg.set(0xB01+i, c3.get(i));
 	}
 	
+	public void setBorder(Value bc)
+	{
+			prg.set(BORDER_COLOR, bc);
+	}
+	
 	public void setBitmap(List<Value> bm)
 	{
 		for (int i = 0; i<bm.size(); i++)

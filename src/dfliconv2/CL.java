@@ -19,6 +19,7 @@ public class CL
 		String dithering = "no";
 		List<String> replace = new ArrayList<>();
 		boolean preview = false;
+		boolean multiPreview = false;
 		if (argv.length==0)
 		{
 			printHelp();
@@ -64,6 +65,8 @@ public class CL
 					outputPrefix = argv[++i];
 				else if ("-p".equals(opt) || "-preview".equals(opt))
 					preview = true;
+				else if ("-2x".equals(opt))
+					multiPreview = true;
 				else if ("-g".equals(opt) || "-gamma".equals(opt))
 					Global.gammaCorrection = Double.parseDouble(argv[++i]);
 				else if ("-s".equals(opt) || "-saturation".equals(opt))
@@ -112,12 +115,6 @@ public class CL
 				
 			Utils.loadOutput(m, baselineFormat, baseline);
 		}
-		
-		if (m==null)
-		{
-			System.out.println("No mode is specified (-m), nothing to do, exiting.");
-			System.exit(0);
-		}
 
 		//Dithering
 		Dithering d = createDithering(dithering);
@@ -132,12 +129,28 @@ public class CL
 				outputPrefix = input;
 		}
 		
-		Optimizer o = new Optimizer(m);
+		if (m==null)
+		{
+			System.out.println("No mode is specified (-m).");
+			if (input!=null)
+			{
+				ImageImpl img = new ImageImpl(input);
+				System.out.println("Creating an image with "+dithering+" dithering for "+input+" ...");
+				//Global.quickDither = true;
+				ImageImpl imgOut = new ImageImpl(img.sourceWidth(),img.sourceHeight());
+				Utils.dither(img, imgOut, img.sourceWidth(), img.sourceHeight(), d, multiPreview);
+				System.out.println("Saving "+outputPrefix+"_preview.png");
+				imgOut.save(outputPrefix+"_preview.png", "png");
+			}
+			else
+				System.out.println("Nothing to do, exiting!");
+			System.exit(0);
+		}
 		
 		//Var replacements
 		for (String rp : replace)
 		{
-			Map<Variable, Value> r = replacements(o,rp);
+			Map<Variable, Value> r = replacements(m,rp);
 			m.visit(new VariableVisitor()
 			{
 				public Value visit(Variable v) 
@@ -145,8 +158,9 @@ public class CL
 					return r.containsKey(v) ? r.get(v) : v;
 				}
 			});
-			o = new Optimizer(m);
 		}
+		
+		Optimizer o = new Optimizer(m);
 		
 		//Now convert
 		if (input!=null)
@@ -160,7 +174,7 @@ public class CL
 		else if (baseline==null)
 		{
 			System.out.println("No input image or baseline.");
-			List<String> vart = summarizeVars(o.vars());
+			List<String> vart = summarizeVars(getVars(m));
 			System.out.println("Variables: "+vart);
 		}
 		
@@ -272,13 +286,15 @@ public class CL
 			d = new Bayer4x4(C);
 		else if ("ord3x3".equals(dithering))
 			d = new Ordered3x3(C);
+		else if ("ord2x4".equals(dithering))
+			d = new Ord2x4(C);
 		else if ("fs".equals(dithering))
 			d = new FS();
-		else if (dithering==null || "no".equals(dithering) || "none".equals(dithering))
+		else if (dithering==null || "no".equals(dithering))
 			d = new NoDithering();
 		else
 		{
-			System.out.println("Dithering methods: [no, point5, bayer2x2, bayer4x4, ord3x3, fs]");
+			System.out.println("Dithering methods: [no, point5, bayer2x2, bayer4x4, ord2x4, ord3x3, fs]");
 			if (!"?".equals(dithering))
 			{
 				System.out.println("Unsupported dithering: "+dithering);
@@ -342,8 +358,9 @@ public class CL
 		System.out.println("Optimization done!");
 	}
 	
-	static Map<Variable,Value> replacements(Optimizer o, String replace)
+	static Map<Variable,Value> replacements(Mode m, String replace)
 	{
+		List<Variable> vars = getVars(m);
 		Map<Variable,Value> rep = new HashMap<>();
 		String[] lr = replace.split("=");
 		if (lr.length==2)
@@ -356,19 +373,19 @@ public class CL
 			{
 				String[] be = leftside.split("\\.\\.\\.");
 				if (be.length==2)
-					lvs = filterVars(o.vars(), be[0], be[1]);
+					lvs = filterVars(vars, be[0], be[1]);
 				else
 					throw new RuntimeException("Invalid varibale range: "+leftside);
 			}
 			else
-				lvs = filterVars(o.vars(),leftside,leftside);
+				lvs = filterVars(vars,leftside,leftside);
 				
 			if (lvs.isEmpty())
 				throw new RuntimeException("No variables defined for: "+leftside);
 			//right side
 			for (String rv : rightside.split(","))
 			{
-				List<Variable> v = filterVars(o.vars(),rv,rv);
+				List<Variable> v = filterVars(vars,rv,rv);
 				if (!v.isEmpty())
 					rvs.addAll(v);
 				else
@@ -392,6 +409,19 @@ public class CL
 		else
 			throw new RuntimeException("Invalid format: "+replace);
 		return rep;
+	}
+
+	private static List<Variable> getVars(Mode m) {
+		List<Variable> vars = new ArrayList<>();
+		m.visit(new VariableVisitor() 
+		{
+			public Value visit(Variable v) 
+			{
+				vars.add(v);
+				return v;
+			}
+		});
+		return vars;
 	}
 	
 	static List<Variable> filterVars(Collection<Variable> vars, String begin, String end)

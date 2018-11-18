@@ -12,6 +12,7 @@ import dfliconv2.Mode;
 import dfliconv2.Optimizable;
 import dfliconv2.Utils;
 import dfliconv2.Value;
+import dfliconv2.Variable;
 import dfliconv2.VariableVisitor;
 import dfliconv2.optimizable.HiresPixels;
 import dfliconv2.value.Add;
@@ -29,6 +30,7 @@ public class HiresFli implements Mode
 	private List<Value> chroma[] = new List[4];
 	private List<Value> bitmap = new ArrayList<>();
 	private List<Value> xshift = new ArrayList<>();
+	private Value border;
 
 	private List<Optimizable> optiz = new ArrayList<>();
 	private int w,h;
@@ -42,6 +44,8 @@ public class HiresFli implements Mode
 	{
 		this.w = w;
 		this.h = h;
+		this.border = new Plus4Color("border");
+		((Variable)border).set(0);
 		Value[][] color0 = {new Value[w*h],new Value[w*h],new Value[w*h],new Value[w*h]};
 		Value[][] color1 = {new Value[w*h],new Value[w*h],new Value[w*h],new Value[w*h]};
 		for (int y = 0; y<h*8; y++)
@@ -97,6 +101,7 @@ public class HiresFli implements Mode
 		chroma[3] = v.visitValues(chroma[3]);
 		xshift = v.visitValues(xshift);
 		optiz = v.visitOptimizables(optiz);
+		border = border.visit(v);
 	}
 	
 	public int width()  { return w*8; }
@@ -128,6 +133,7 @@ public class HiresFli implements Mode
 		{
 			List<Value> prg = Utils.loadViewer("dfli.prg");
 			prg.addAll(Collections.nCopies(4, new Const(0x14)));
+			prg.add(border);
 			prg.addAll(Collections.nCopies(400, Const.ZERO));
 			for (Value xs : xshift)
 			{

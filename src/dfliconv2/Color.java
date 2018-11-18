@@ -43,6 +43,11 @@ public class Color
 		return (c0-o0)*(c0-o0) + (c1-o1)*(c1-o1) + (c2-o2)*(c2-o2); 
 	}
 	
+	public static double d2(double c10, double c11, double c12,double c20, double c21, double c22)
+	{
+		return (c10-c20)*(c10-c20) + (c11-c21)*(c11-c21) + (c12-c22)*(c12-c22); 
+	}
+	
 	public Color add(Color o)
 	{
 		return new Color(this.c0+o.c0, this.c1+o.c1, this.c2+o.c2);

@@ -14,6 +14,9 @@ colorRam0 = $4000
 	sei
 	sta $ff3f
 
+	lda border
+	pha 
+	
 	jsr initData
 
 	lda #$ff
@@ -36,13 +39,13 @@ colorRam0 = $4000
 	lda #hi(irq)
 	sta $ffff
 	
+	pla
+	sta $ff19
 	
 	inc $ff09
 	cli
 
-	
 loop:
-	nop
 	jmp loop
 	
 irq:
@@ -103,11 +106,9 @@ y   set y+1
 	sta $ff15
 	lda #0
 	sta $ff16
+	
 	lda #$18
 	sta $ff07
-
-	;lda #25*8+3
-	;sta $ff1d
 
 	inc $ff09
 tempa = *+1
@@ -175,20 +176,19 @@ sp = $d0
 	ldy #64
 -
 	lda bm,x
-dest_hi = *+2
 	sta bitmap,x
 	inx
 	bne -
-	inc -+2
-	inc dest_hi
+	inc - + 2
+	inc - + 5
 	dey
 	bne -
 	rts
 	
 data:
 	;byt $14,$14,$14,$14
-	
-tab15   = data+4
+border  = data+4 	
+tab15   = data+5
 tab16   = tab15+200
 tab07   = tab16+200
 bm      = tab07+200

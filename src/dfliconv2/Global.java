@@ -15,6 +15,8 @@ public class Global
 
 	public static int VERBOSITY = 1;
 	
+	public static boolean quickDither = true;
+	
 	public static Color imageColor(RGB c)
 	{
 		return c.gamma(gammaCorrection).toYUV().saturation(saturation).toRGB().toLab();

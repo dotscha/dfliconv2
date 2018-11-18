@@ -4,27 +4,41 @@ import java.util.Arrays;
 import java.util.Comparator;
 
 import dfliconv2.Color;
+import dfliconv2.Global;
 import dfliconv2.Palette;
 
 public abstract class OrderedBase extends Base
 {
 	private double max2 = 500*500;
+	private int steps;
 	
 	protected OrderedBase(double max) 
 	{
 		max2 = max*max;
+		steps = 0;
+		for (int t : matrix())
+			if (t>steps)
+				steps = t;
+		steps++;
 	}
 	
-	public abstract int dim();
+	public abstract int dimx();
+	public          int dimy() { return matrix().length/dimx(); }
+	
+	
 	public abstract int[] matrix();
 	
 	public int select(int x, int y, float p0, float p1, float p2, int... colors) 
 	{
-		int d = dim();
-		int[] w = new int[colors.length];
 		int[] bestw = new int[colors.length];
-		double[] beste = {Double.MAX_VALUE};
-		find(p0,p1,p2,d*d,bestw,beste,0,w,colors);
+		if (Global.quickDither)
+		{
+			find2(p0,p1,p2,steps,bestw,colors);
+		}
+		else
+		{
+			findN(p0,p1,p2,steps,bestw,colors,4);
+		}
 		Integer[] cix = new Integer[colors.length];
 		for (int i=0; i<colors.length; i++)
 			cix[i] = i;
@@ -35,7 +49,8 @@ public abstract class OrderedBase extends Base
 				return colors[i1]-colors[i2];
 			}
 		});
-		int th = matrix()[x%d+(y%d)*d];
+		int dx = dimx(), dy = dimy();
+		int th = matrix()[x%dx+(y%dy)*dx];
 		for (int j=0; j<colors.length; j++)
 		{
 			int i = cix[j];
@@ -48,10 +63,67 @@ public abstract class OrderedBase extends Base
 	
 	private boolean badPair(int c0, int c1) 
 	{
-		return c0==c1 || Palette.getColor(c0).d2(Palette.getColor(c1))>max2;
+		return c0==c1 || Palette.dist(c0,c1)>max2;
 	}
 	
-	private void find(float p0, float p1, float p2, int sum, int[] bestw, double[] beste, int ci, int[] w, int[] colors)
+	private void find2(float p0, float p1, float p2, int sum, int[] bestw, int[] colors)
+	{
+		int besti = -1, bestj = -1, bestwi = sum;
+		double beste = Double.MAX_VALUE;
+		for (int i = 0; i<colors.length; i++)
+		{
+			if (colors[i]<0)
+				continue;
+			Color ci = Palette.getColor(colors[i]);
+			for (int j = i; j<colors.length; j++)
+			{
+				if (i==j)
+				{
+					double e = ci.d2(p0,p1,p2);
+					if (e<beste)
+					{
+						beste = e;
+						besti = bestj = i;
+						bestwi = sum;
+					}
+				}
+				else
+				{
+					if (colors[j]<0 || badPair(colors[i],colors[j]))
+						continue;
+					Color cj = Palette.getColor(colors[j]);
+					for (int wi = 1; wi<sum; wi++)
+					{
+						double w_i = ((double)wi)/sum;
+						double w_j = 1-w_i;
+						double e = Color.d2(p0,p1,p2,w_i*ci.c0 + w_j*cj.c0,w_i*ci.c1 + w_j*cj.c1,w_i*ci.c2 + w_j*cj.c2);
+						if (e<beste)
+						{
+							beste = e;
+							besti = i;
+							bestj = j;
+							bestwi = wi;
+						}
+					}
+				}
+			}
+		}
+		if (besti<0)
+			throw new RuntimeException("Can't use any colors.");
+		bestw[bestj] = sum - bestwi;
+		bestw[besti] = bestwi;
+	}
+	
+	private void findN(float p0, float p1, float p2, int sum, int[] bestw, int[] colors, int n)
+	{
+		double[] beste = {Double.MAX_VALUE};
+		int[] w = new int[colors.length];
+		findN(p0,p1,p2,sum,bestw,beste,0,w,colors,n);
+		if (beste[0]==Double.MAX_VALUE)
+			throw new RuntimeException("Can't use any colors.");
+	}
+	
+	private void findN(float p0, float p1, float p2, int sum, int[] bestw, double[] beste, int ci, int[] w, int[] colors, int n)
 	{
 		if (ci==colors.length)
 		{
@@ -67,7 +139,7 @@ public abstract class OrderedBase extends Base
 					c2 += wi*(p2 - c.c2);
 				}
 			}
-			double e = (c0*c0 + c1*c1 + c2*c2)/dim()/dim();
+			double e = (c0*c0 + c1*c1 + c2*c2)/steps/steps;
 			if (e<beste[0])
 			{
 				beste[0] = e;
@@ -79,17 +151,20 @@ public abstract class OrderedBase extends Base
 			if (sum==0)
 			{
 				w[ci]=0;
-				find(p0,p1,p2,0,bestw,beste,ci+1,w,colors);
+				findN(p0,p1,p2,0,bestw,beste,ci+1,w,colors,n);
 			}
 			else
 			{
-				boolean iter = true;
-				for (int cj = 0; cj<ci; cj++)
+				boolean iter = colors[ci]>=0;
+				if (iter)
 				{
-					if (w[cj]>0 && badPair(colors[cj],colors[ci]))
+					for (int cj = 0; cj<ci; cj++)
 					{
-						iter = false;
-						break;
+						if (w[cj]>0 && badPair(colors[cj],colors[ci]))
+						{
+							iter = false;
+							break;
+						}
 					}
 				}
 				if (iter)
@@ -97,14 +172,24 @@ public abstract class OrderedBase extends Base
 					if (ci==colors.length-1)
 					{
 						w[ci] = sum;
-						find(p0,p1,p2,0,bestw,beste,ci+1,w,colors);
+						findN(p0,p1,p2,0,bestw,beste,ci+1,w,colors,0);
 					}
 					else
 					{
-						for (int wi = 0; wi<=sum; wi++)
+						if (n==1)
 						{
-							w[ci] = wi;
-							find(p0,p1,p2,sum-wi,bestw,beste,ci+1,w,colors);
+							w[ci] = 0;
+							findN(p0,p1,p2,sum,bestw,beste,ci+1,w,colors, 1);
+							w[ci] = sum;
+							findN(p0,p1,p2,0,bestw,beste,ci+1,w,colors, 0);
+						}
+						else
+						{
+							for (int wi = 0; wi<=sum; wi++)
+							{
+								w[ci] = wi;
+								findN(p0,p1,p2,sum-wi,bestw,beste,ci+1,w,colors, wi==0 ? n : (n-1));
+							}
 						}
 					}
 				}
@@ -112,7 +197,7 @@ public abstract class OrderedBase extends Base
 				{
 					w[ci] = 0;
 					if (ci<colors.length-1)
-						find(p0,p1,p2,sum,bestw,beste,ci+1,w,colors);
+						findN(p0,p1,p2,sum,bestw,beste,ci+1,w,colors,n);
 				}
 			}
 		}

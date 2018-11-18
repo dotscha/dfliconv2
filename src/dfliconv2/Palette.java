@@ -144,6 +144,8 @@ public class Palette
 	private static java.awt.Color[] awtPalette = new java.awt.Color[128];
 	private static Color[] palette = new Color[128];
 	
+	private static Double[] distMatrix = null;
+	
 	static
 	{
 		for (int i = 0; i<128; i++)
@@ -168,6 +170,7 @@ public class Palette
 				palette[luma*16+chroma] = Global.paletteColor(new RGB(pal.getRGB(x,y)));
 			}
 		}
+		distMatrix = null;
 	}
 	
 	public static void savePal(String file) throws IOException
@@ -191,6 +194,17 @@ public class Palette
 	public static Color getColor(int i)
 	{
 		return palette[i];
+	}
+	
+	public static double dist(int i, int j)
+	{
+		if (distMatrix==null)
+			distMatrix = new Double[128*128];
+		int d1 = 128*i+j, d2 = i+128*j;
+		if (distMatrix[d1]!=null)
+			return distMatrix[d1];
+		else
+			return distMatrix[d1] = distMatrix[d2] = (double)getColor(i).d2(getColor(j));
 	}
 	
 	public static java.awt.Color getAwtColor(int i)

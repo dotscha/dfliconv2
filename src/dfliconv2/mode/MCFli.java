@@ -33,6 +33,7 @@ public class MCFli implements Mode
 	private List<Value> bitmap = new ArrayList<>();
 	private List<Value> color0 = new ArrayList<>(), color3 = new ArrayList<>();
 	private List<Value> xshift = new ArrayList<>();
+	private Value border;
 
 	private List<Optimizable> optiz = new ArrayList<>();
 	private int w,h;
@@ -46,6 +47,8 @@ public class MCFli implements Mode
 	{
 		this.w = w;
 		this.h = h;
+		this.border = new Plus4Color("border");
+		((Variable)border).set(0);
 		Value[][] color1 = {new Value[w*h],new Value[w*h],new Value[w*h],new Value[w*h]};
 		Value[][] color2 = {new Value[w*h],new Value[w*h],new Value[w*h],new Value[w*h]};
 		for (int y = 0; y<h*8; y++)
@@ -106,6 +109,7 @@ public class MCFli implements Mode
 		color3 = v.visitValues(color3);
 		xshift = v.visitValues(xshift);
 		optiz = v.visitOptimizables(optiz);
+		border = border.visit(v);
 	}
 	
 	public int width()  { return w*8; }
@@ -141,6 +145,7 @@ public class MCFli implements Mode
 		{
 			List<Value> prg = Utils.loadViewer("dfli.prg");
 			prg.addAll(Collections.nCopies(4, new Const(0x14)));
+			prg.add(border);
 			prg.addAll(color0);
 			prg.addAll(color3);
 			for (Value xs : xshift)
@@ -165,6 +170,7 @@ public class MCFli implements Mode
 			v.setHeight(h*8);
 			v.setColor0(color0);
 			v.setColor3(color3);
+			v.setBorder(border);
 			List<Value> xsh = new ArrayList<>();
 			for (Value xs : xshift)
 			{
