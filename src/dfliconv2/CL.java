@@ -226,7 +226,8 @@ public class CL
 		System.out.println("    -b <baseline prefix>  : import previous conversion");
 		System.out.println("    -bf <baseline format> : format of baseline");
 		System.out.println("    -nx                   : disable xshift optimization");
-		System.out.println("    -pal <palette image>  : load palette from image");
+		System.out.println("    -pal <palette image>  : load palette from PNG image");
+		System.out.println("    -2x                   : create multi preview when no mode is defined");
 		System.out.println("");
 		System.out.println("Long options are: -help, -mode, -format, -dithering, -input, -output-prefix, -preview, -replace, -gamma, -saturation, -baseline, -baseline-format, -no-xshift ");
 	}
