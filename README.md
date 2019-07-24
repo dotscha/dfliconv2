@@ -154,6 +154,8 @@ You don't have to use a "full" range, you can use "xshint_008...xshift_015" too.
 
 I think you get the idea.
 
+One more thing: You can use -1 on the right hand side for colors. That will instruct the converter to ignore that color on the picture. You might want to use that color in your sprite over the bitmap, right? ;)
+
 ### Other notes
 
 The input image is never resized (as mentioned above). The image is treated as a periodic pattern in both directions.
