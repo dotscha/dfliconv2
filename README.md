@@ -124,6 +124,7 @@ Not all supported modes have a executable `prg` format yet, like `prg` is not su
  * `point5`, `bayer2x2`, `bayer4x4`, `ord3x3`, `ord2x4` only use "close" colors to reduce noise. Option to define what is "close" will be implemented later. Current definition is the distance of color 0x00 and 0x11.
 
 Other dithering methods may be added later.
+All dithering methods use only relatively "close" colors for dithering to reduce the noise in the result. The definition of "close" is the distance between the palette colors 0x00 and 0x11. You can use the -cc 0x??-0x?? option to override that, the default is equivalent to -cc 0x00-0x11.
 
 ### List of graphic mode variables
 
@@ -167,7 +168,6 @@ You can use the `-g` and `-s` options to do gamma correction and change the satu
 
  * TODO: set 38 coloum mode when xshift is not 0 in every line.
  * add separate options for pre-dithering and post-dithering. The idea is that a pre-dithered image is used to optimize colors and post-dithering is used to create the actual output.
- * option to define what is "close" color.
  * user defined graphic modes with some examples (eg. some c64 modes)
  * add more graphic modes, including character modes with optimized charset to approximate the picture with 256 chars.
 
