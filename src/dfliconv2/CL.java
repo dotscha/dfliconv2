@@ -77,6 +77,8 @@ public class CL
 					Global.R = new Random(Long.parseLong(argv[++i]));
 				else if ("-pal".equals(opt))
 					Palette.loadPal(argv[++i]);
+				else if ("-cc".equals(opt) || "-close-colors".equals(opt))
+					setCloseColors(argv[++i]);
 				else
 					throw new RuntimeException("Unknown option: "+opt);
 			}
@@ -136,7 +138,7 @@ public class CL
 			{
 				ImageImpl img = new ImageImpl(input);
 				System.out.println("Creating an image with "+dithering+" dithering for "+input+" ...");
-				//Global.quickDither = true;
+				Global.quickDither = true;
 				ImageImpl imgOut = new ImageImpl(img.sourceWidth(),img.sourceHeight());
 				Utils.dither(img, imgOut, img.sourceWidth(), img.sourceHeight(), d, multiPreview);
 				System.out.println("Saving "+outputPrefix+"_preview.png");
@@ -160,8 +162,6 @@ public class CL
 			});
 		}
 		
-		Optimizer o = new Optimizer(m);
-		
 		//Now convert
 		if (input!=null)
 		{
@@ -169,7 +169,17 @@ public class CL
 			
 			ImageImpl img = new ImageImpl(input);
 			
-			optimize(img,img,o,m,d);			
+			int optimization = 1;
+			do
+			{
+				if (optimization>1)
+					System.out.println("Post-processing requires new optimization phase.");
+				Optimizer o = new Optimizer(m);
+				optimize(img,o);
+				optimization++;
+			} 
+			while (m.postProcessing(img,d));
+			Utils.update(m,img,d);
 		}
 		else if (baseline==null)
 		{
@@ -227,9 +237,10 @@ public class CL
 		System.out.println("    -bf <baseline format> : format of baseline");
 		System.out.println("    -nx                   : disable xshift optimization");
 		System.out.println("    -pal <palette image>  : load palette from PNG image");
+		System.out.println("    -cc <color1>-<color2> : define what are close colors by giving an examle, like 0x00-0x11 (default)");
 		System.out.println("    -2x                   : create multi preview when no mode is defined");
 		System.out.println("");
-		System.out.println("Long options are: -help, -mode, -format, -dithering, -input, -output-prefix, -preview, -replace, -gamma, -saturation, -baseline, -baseline-format, -no-xshift ");
+		System.out.println("Long options are: -help, -mode, -format, -dithering, -input, -output-prefix, -preview, -replace, -gamma, -saturation, -baseline, -baseline-format, -no-xshift, -close-colors");
 	}
 
 	private static List<String> summarizeVars(Collection<Variable> vars) 
@@ -305,14 +316,14 @@ public class CL
 		return d;
 	}
 
-	static void optimize(ImageImpl img_opti, ImageImpl img_final, Optimizer o, Mode m, Dithering dfinal) 
+	static void optimize(ImageImpl img, Optimizer o) 
 	{
 		Dithering dopti = new NoDithering();
 		
 		if (coordPreOpt)
 		{
 			System.out.print("Coordinate pre-optimization: ");
-			if(o.optimizeCoords(img_opti, dopti))
+			if(o.optimizeCoords(img, dopti))
 				System.out.println("done");
 			else
 				System.out.println("no coordinate variables");
@@ -331,21 +342,20 @@ public class CL
 			{
 				case 1:
 					System.out.println("phase (bf) "+ p);
-					err1 = Math.min(err1, o.optimizeBF(img_opti,dopti, p>=7, globals-->0, locals-->0));
+					err1 = Math.min(err1, o.optimizeBF(img,dopti, p>=7, globals-->0, locals-->0));
 				break;
 				
 				case 2:
 					System.out.println("phase (md) "+ p);
-					err1 = Math.min(err1, o.optimizeLocalMultiDim(img_opti,dopti));
+					err1 = Math.min(err1, o.optimizeLocalMultiDim(img,dopti));
 				break;
 				
 				case 0:
 					System.out.println("phase (km) "+ p);
-					err1 = Math.min(err1, o.optimizeKM(img_opti,dopti));
+					err1 = Math.min(err1, o.optimizeKM(img,dopti));
 				break;
 			}
 			System.out.println("error: "+err1);
-			//o.printChanges();
 			p++;
 			if (err0>err1)
 				ceq=0;
@@ -353,9 +363,8 @@ public class CL
 				ceq++;
 		} 
 		while (p<7 || err0>err1 || ceq<4);
-		o.optimizeKM(img_final,dopti);
+		o.optimizeKM(img,dopti);
 		o.resetUnusedColorVarables();
-		Utils.update(m, img_final, dfinal);
 		System.out.println("Optimization done!");
 	}
 	
@@ -432,5 +441,12 @@ public class CL
 			if (v.name().compareTo(begin)>=0 && v.name().compareTo(end)<=0)
 				vs.add(v);
 		return vs;
+	}
+	
+	static void setCloseColors(String cc)
+	{
+		String[] c12 = cc.split("-");
+		Global.c1 = ValueFactory.createConst(c12[0]).get();
+		Global.c2 = ValueFactory.createConst(c12[1]).get();
 	}
 }

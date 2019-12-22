@@ -138,7 +138,7 @@ public class Optimizer
 		return optimizeBF(img,d,coords,true,true);
 	}
 	
-	private static final int SMALL_GROUP = 16;
+	private static final int SMALL_GROUP = 64;
 
 	public double optimizeBF(Image img, Dithering d, boolean coords, boolean globals, boolean locals)
 	{

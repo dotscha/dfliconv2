@@ -8,6 +8,8 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
+import dfliconv2.Dithering;
+import dfliconv2.Image;
 import dfliconv2.Mode;
 import dfliconv2.Optimizable;
 import dfliconv2.Utils;
@@ -83,8 +85,9 @@ public class HiresFli implements Mode
 				Value b5 = Utils.randomize(new Bits.One("b_"+(x+5)+"_"+y));
 				Value b6 = Utils.randomize(new Bits.One("b_"+(x+6)+"_"+y));
 				Value b7 = Utils.randomize(new Bits.One("b_"+(x+7)+"_"+y));
-				bitmap.add(new HiresByte(b0,b1,b2,b3,b4,b5,b6,b7));
-				optiz.add(new HiresPixels(new Add(new Const(x),xshift.get(y)),new Const(y),color0[m][i],color1[m][i],b0,b1,b2,b3,b4,b5,b6,b7));
+				HiresPixels hp = new HiresPixels(new Add(new Const(x),xshift.get(y)),new Const(y),color0[m][i],color1[m][i],b0,b1,b2,b3,b4,b5,b6,b7);
+				optiz.add(hp);
+				bitmap.add(hp.getValue());
 			}
 		}
 	}
@@ -157,5 +160,10 @@ public class HiresFli implements Mode
 	public List<Optimizable> optimizables() 
 	{
 		return optiz;
+	}
+
+	public boolean postProcessing(Image image, Dithering dithering) 
+	{
+		return false;
 	}
 }

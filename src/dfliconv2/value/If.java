@@ -9,7 +9,7 @@ public class If extends Value
 	
 	public If(Value cond, Value vThen, Value vElse) 
 	{
-		this.cond = vThen;
+		this.cond = cond;
 		this.valueThen = vThen;
 		this.valueElse = vElse;
 	}
@@ -21,7 +21,7 @@ public class If extends Value
 
 	public int get() 
 	{
-		return cond.get()==0 ? valueElse.get() : valueThen.get();
+		return cond.get()!=0 ? valueThen.get() : valueElse.get();
 	}
 
 	public Value visit(VariableVisitor v) 
@@ -31,5 +31,4 @@ public class If extends Value
 		valueElse = valueElse.visit(v);
 		return this;
 	}
-
 }

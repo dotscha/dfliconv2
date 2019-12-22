@@ -7,6 +7,8 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
+import dfliconv2.Dithering;
+import dfliconv2.Image;
 import dfliconv2.Mode;
 import dfliconv2.Optimizable;
 import dfliconv2.Utils;
@@ -112,10 +114,11 @@ public class GenericFli implements Mode
 					Value b5 = Utils.randomize(new Bits.One("b_"+(x+5)+"_"+y));
 					Value b6 = Utils.randomize(new Bits.One("b_"+(x+6)+"_"+y));
 					Value b7 = Utils.randomize(new Bits.One("b_"+(x+7)+"_"+y));
-					bitmap.add(new HiresByte(b0,b1,b2,b3,b4,b5,b6,b7));
 					Value color0 = new Nibbles(lums[y][x/8*2+0],chrs[y][x/8*2+0]);
 					Value color1 = new Nibbles(lums[y][x/8*2+1],chrs[y][x/8*2+1]);
-					optiz.add(new HiresPixels(new Add(new Const(x),xshift.get(y)),new Const(y),color0,color1,b0,b1,b2,b3,b4,b5,b6,b7));
+					HiresPixels hp = new HiresPixels(new Add(new Const(x),xshift.get(y)),new Const(y),color0,color1,b0,b1,b2,b3,b4,b5,b6,b7); 
+					optiz.add(hp);
+					bitmap.add(hp.getValue());
 				}
 				else
 				{
@@ -123,10 +126,11 @@ public class GenericFli implements Mode
 					Value b23 = Utils.randomize(new Bits.Two("b_"+(x+2)+"_"+y));
 					Value b45 = Utils.randomize(new Bits.Two("b_"+(x+4)+"_"+y));
 					Value b67 = Utils.randomize(new Bits.Two("b_"+(x+6)+"_"+y));
-					bitmap.add(new MultiByte(b01,b23,b45,b67));
 					Value color1 = new Nibbles(lums[y][x/8*2+0],chrs[y][x/8*2+0]);
 					Value color2 = new Nibbles(lums[y][x/8*2+1],chrs[y][x/8*2+1]);
-					optiz.add(new MultiPixels(new Add(new Const(x),xshift.get(y)),new Const(y),color0.get(y),color1,color2,color3.get(y),b01,b23,b45,b67));
+					MultiPixels mp = new MultiPixels(new Add(new Const(x),xshift.get(y)),new Const(y),color0.get(y),color1,color2,color3.get(y),b01,b23,b45,b67);
+					optiz.add(mp);
+					bitmap.add(mp.getValue());
 				}
 			}
 		}
@@ -270,5 +274,10 @@ public class GenericFli implements Mode
 		color3 = v.visitValues(color3);
 		optiz = v.visitOptimizables(optiz);
 		border = border.visit(v);
+	}
+
+	public boolean postProcessing(Image image, Dithering dithering) 
+	{
+		return false;
 	}
 }

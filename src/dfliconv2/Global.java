@@ -15,7 +15,7 @@ public class Global
 
 	public static int VERBOSITY = 1;
 	
-	public static boolean quickDither = true;
+	public static boolean quickDither = false;
 	
 	public static Color imageColor(RGB c)
 	{
@@ -28,9 +28,11 @@ public class Global
 		return nc;
 	}
 
+	public static int c1 = 0x00;
+	public static int c2 = 0x11;
+	
 	public static double closeColors()
 	{
-		return Math.sqrt(Palette.getColor(0).d2(Palette.getColor(0x11)));
+		return Math.sqrt(Palette.getColor(c1).d2(Palette.getColor(c2)));
 	}
-
 }

@@ -7,6 +7,8 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
+import dfliconv2.Dithering;
+import dfliconv2.Image;
 import dfliconv2.Mode;
 import dfliconv2.Optimizable;
 import dfliconv2.Utils;
@@ -31,6 +33,7 @@ public class HiresBitmapPlus implements Mode
 	protected List<Value> xshift = new ArrayList<>();
 	protected List<Optimizable> optiz = new ArrayList<>();
 	private Value border;
+	
 	protected int w,h;
 
 	public HiresBitmapPlus()
@@ -81,11 +84,13 @@ public class HiresBitmapPlus implements Mode
 				Value b5 = Utils.randomize(new Bits.One("b_"+(x+5)+"_"+y));
 				Value b6 = Utils.randomize(new Bits.One("b_"+(x+6)+"_"+y));
 				Value b7 = Utils.randomize(new Bits.One("b_"+(x+7)+"_"+y));
-				bitmap.add(new HiresByte(b0,b1,b2,b3,b4,b5,b6,b7));
+				HiresPixels hp = null;
 				if (xs)
-					optiz.add(new HiresPixels(new Add(new Const(x),xshift.get(y)),new Const(y),color0[i],color1[i],b0,b1,b2,b3,b4,b5,b6,b7));
+					hp = new HiresPixels(new Add(new Const(x),xshift.get(y)),new Const(y),color0[i],color1[i],b0,b1,b2,b3,b4,b5,b6,b7);
 				else
-					optiz.add(new HiresPixels(new Const(x),new Const(y),color0[i],color1[i],b0,b1,b2,b3,b4,b5,b6,b7));
+					hp = new HiresPixels(new Const(x),new Const(y),color0[i],color1[i],b0,b1,b2,b3,b4,b5,b6,b7);
+				optiz.add(hp);
+				bitmap.add(hp.getValue());
 
 			}
 		}
@@ -146,5 +151,10 @@ public class HiresBitmapPlus implements Mode
 	public List<Optimizable> optimizables() 
 	{
 		return optiz;
+	}
+
+	public boolean postProcessing(Image image, Dithering dithering) 
+	{
+		return false;
 	}
 }

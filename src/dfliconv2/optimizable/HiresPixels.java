@@ -42,6 +42,11 @@ public class HiresPixels extends Optimizable
 		return b.get();
 	}
 	
+	public Value getValue()
+	{
+		return b;
+	}
+	
 	public Value x() { return x;}
 	public Value y() { return y;}
 	public int width() { return 8;}

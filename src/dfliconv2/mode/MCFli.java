@@ -8,6 +8,8 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
+import dfliconv2.Dithering;
+import dfliconv2.Image;
 import dfliconv2.Mode;
 import dfliconv2.Optimizable;
 import dfliconv2.Utils;
@@ -89,8 +91,9 @@ public class MCFli implements Mode
 				Value b23 = Utils.randomize(new Bits.Two("b_"+(x+2)+"_"+y));
 				Value b45 = Utils.randomize(new Bits.Two("b_"+(x+4)+"_"+y));
 				Value b67 = Utils.randomize(new Bits.Two("b_"+(x+6)+"_"+y));
-				bitmap.add(new MultiByte(b01,b23,b45,b67));
-				optiz.add(new MultiPixels(new Add(new Const(x),xshift.get(y)),new Const(y),color0.get(y),color1[m][i],color2[m][i],color3.get(y),b01,b23,b45,b67));
+				MultiPixels mp = new MultiPixels(new Add(new Const(x),xshift.get(y)),new Const(y),color0.get(y),color1[m][i],color2[m][i],color3.get(y),b01,b23,b45,b67);
+				optiz.add(mp);
+				bitmap.add(mp.getValue());
 			}
 		}
 	}
@@ -189,5 +192,10 @@ public class MCFli implements Mode
 	public List<Optimizable> optimizables() 
 	{
 		return optiz;
+	}
+
+	public boolean postProcessing(Image image, Dithering dithering) 
+	{
+		return false;
 	}
 }

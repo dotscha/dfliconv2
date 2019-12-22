@@ -24,7 +24,7 @@ test: $(LIB)
 	#$(JAVA) -cp $(LIB) dfliconv2.CL -i tiger.jpg -m multi+ -s 2 -p -d point5 -o tiger_mp
 	#$(JAVA) -cp $(LIB) dfliconv2.CL -i tiger.jpg -m multi-dfli -s 2 -p -d point5 -o tiger_mdfli
 	#$(JAVA) -cp $(LIB) dfliconv2.CL -i tiger.jpg -m hires-dfli -s 2 -p -d point5 -o tiger_hdfli
-	$(JAVA) -cp $(LIB) dfliconv2.CL -i tiger.jpg -m "gfli('m','clllclll')" -d point5 -o tiger_2xclll -pal PAL/TED-colodore-90-65-50.png -s 1.4
+	$(JAVA) -cp $(LIB) dfliconv2.CL -i tiger.jpg -m "gfli('m','clllclll')" -d point5 -o tiger_2xclll -s 2 -p
 
 src/viewer/%.prg : src/viewer/%.asm
 	$(ASS) src/viewer/$(*)

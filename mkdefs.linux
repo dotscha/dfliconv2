@@ -1,4 +1,5 @@
-JAVAC = ecj -1.5 -nowarn
+#JAVAC = ecj -1.5 -nowarn
+JAVAC = javac
 JAVA = java
 JAR = jar cf
 EXO = ~/exo209/src/exomizer

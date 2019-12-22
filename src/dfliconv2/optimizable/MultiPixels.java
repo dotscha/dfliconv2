@@ -36,7 +36,12 @@ public class MultiPixels extends Optimizable
 	public int get() 
 	{
 		return b.get();
-	}	
+	}
+	
+	public Value getValue()
+	{
+		return b;
+	}
 
 	public Value x() { return x;}
 	public Value y() { return y;}
@@ -51,7 +56,6 @@ public class MultiPixels extends Optimizable
 		color3 = color3.visit(v);
 		x = x.visit(v);
 		y = y.visit(v);
-		//super.visit(v);
 		return this;
 	}
 
@@ -109,7 +113,7 @@ public class MultiPixels extends Optimizable
 			{
 				Color p0 = img.get(xc+2*x+0,yc);
 				Color p1 = img.get(xc+2*x+1,yc);
-				((Variable)bs[x]).set(d.select(xc/2+x, yc, new Color((p0.c0+p1.c0)/2,(p0.c1+p1.c1)/2,(p0.c2+p1.c2)/2), c0, c1, c2, c3));
+				((Variable)bs[x]).set(d.select(xc/2+x, yc, (p0.c0+p1.c0)/2,(p0.c1+p1.c1)/2,(p0.c2+p1.c2)/2, c0, c1, c2, c3));
 			}
 		}
 	}

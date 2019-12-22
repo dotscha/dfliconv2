@@ -56,7 +56,12 @@ To generic multi fli mode with badline config 'clllllll':
 
 `> dfliconv2 -m gfli('m','clllllll') -d point5 -i image.jpg -p`
 
-### Create a dithered preview without conversion
+### Custom palettes
+
+You can use a 16x8 color table in a PNG image as a Plus/4 palette with the -pal option. 
+There are some examples ain the pal folder, two of them were directly downloaded from the https://www.colodore.com website.
+
+### Create a dithered image without conversion
 
 You can simply convert an image to Plus/4 colors with dithering as well.
 
@@ -68,10 +73,6 @@ Create a multi dithered image with Plus/4 colors.
 
 `> dfliconv2 -i image.jpg -d bayer2x2 -2x`
 
-### Custom palettes
-
-You can use a 16x8 color table in a PNG image as a Plus/4 palette with the -pal option. 
-There are some examples are in the pal folder, two of them were directly downloaded from the https://www.colodore.com website.
 
 ### Conversion between formats
 
@@ -162,6 +163,7 @@ You can use the `-g` and `-s` options to do gamma correction and change the satu
 
 ### Plans
 
+ * TODO: set 38 coloum mode when xshift is not 0 in every line.
  * add separate options for pre-dithering and post-dithering. The idea is that a pre-dithered image is used to optimize colors and post-dithering is used to create the actual output.
  * option to define what is "close" color.
  * user defined graphic modes with some examples (eg. some c64 modes)

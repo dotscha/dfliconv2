@@ -20,6 +20,7 @@ public class ValueFactory
 		register("mod",Mod.class);
 		register("and",And.class);
 		register("or",Or.class);
+		register("eq",Equ.class);
 		register("if",If.class);
 		register("switch4",Switch4.class);
 		register("nibbles",Nibbles.class);
@@ -83,7 +84,7 @@ public class ValueFactory
 				end[0] = step+1;
 				try 
 				{
-					return (Value)ctor.newInstance(vs);
+					return (Value)ctor.newInstance((Object[])vs);
 				} 
 				catch (Exception e) 
 				{
