@@ -56,6 +56,10 @@ To generic multi fli mode with badline config 'clllllll':
 
 `> dfliconv2 -m gfli('m','clllllll') -d point5 -i image.jpg -p`
 
+To generic multi fli mode with zoom4 dma pattern 'c--lc--l':
+
+`> dfliconv2 -m gfli('m','c--lc--l') -d point5 -i image.jpg -p`
+
 ### Custom palettes
 
 You can use a 16x8 color table in a PNG image as a Plus/4 palette with the -pal option. 
@@ -102,7 +106,7 @@ The current list is:
 
 The list includes parameterized modes too, like `hires(w,h)` where `w` and `h` stands for width and height in characters.
 So, for example `-m "hires(80,25)"` means hires bitmap of dimensions 640x200, ie. a double screen hires mode.
-New graphic modes will be added incrementally.
+For generic fli (gfli) `m` is one of 'm' or 'h' what stands for multi or hires and `dma0...dma7` each can be one of 'c','l' or '-' what stands for chroma dma, luma dma or no dma. Good to know that chroma dma shows the new colors in the same rasterline but luma dma only has its effect on the next rasterline. The normal dma sequence is 'c------l', the DFLI dma sequence is 'clclclcl' and the zoom4 dma sequence is 'c--lc--l'.
 
 ### Supported output formats
 
@@ -121,10 +125,11 @@ Not all supported modes have a executable `prg` format yet, like `prg` is not su
 
  * `fs` stands for Floyd-Steinberg dithering.
  * `point5` only uses plain colors or chessboard dithering. 
- * `point5`, `bayer2x2`, `bayer4x4`, `ord3x3`, `ord2x4` only use "close" colors to reduce noise. Option to define what is "close" will be implemented later. Current definition is the distance of color 0x00 and 0x11.
+ * `point5`, `bayer2x2`, `bayer4x4`, `ord3x3`, `ord2x4` only use "close" colors to reduce noise (see below). 
 
 Other dithering methods may be added later.
-All dithering methods use only relatively "close" colors for dithering to reduce the noise in the result. The definition of "close" is the distance between the palette colors 0x00 and 0x11. You can use the -cc 0x??-0x?? option to override that, the default is equivalent to -cc 0x00-0x11.
+
+All dithering methods except fs only use relatively "close" colors for dithering to reduce the noise in the result. The definition of "close" is the distance between the palette colors 0x00 and 0x11. You can use the -cc 0x??-0x?? option to override that, the default is equivalent to -cc 0x00-0x11.
 
 ### List of graphic mode variables
 
